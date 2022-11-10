@@ -23,6 +23,8 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class WordChainGameClientRoomView extends JFrame{
 
@@ -33,6 +35,12 @@ public class WordChainGameClientRoomView extends JFrame{
 	private Image scoreBackground = new ImageIcon("images/score.png").getImage();
 	private Image timerBackground = new ImageIcon("images/timer.png").getImage();
 	private Image resizeBackground = timerBackground.getScaledInstance(120, 120,Image.SCALE_SMOOTH);
+	
+	private ImageIcon happyEmo = new ImageIcon("images/emoticon_happy.png");
+	private ImageIcon loveEmo = new ImageIcon("images/emoticon_love.png");
+	private ImageIcon supriseEmo = new ImageIcon("images/emoticon_suprise.png");
+	private ImageIcon sleepEmo = new ImageIcon("images/emoticon_sleep.png");
+	private ImageIcon AngryEmo = new ImageIcon("images/emoticon_angry.png");
 	
 	private JTextField textField;
 	
@@ -95,23 +103,19 @@ public class WordChainGameClientRoomView extends JFrame{
 		contentPanel.add(btnNewButton);
 		
 		JLabel roomNameLabel = new JLabel("RoomName");
-		roomNameLabel.setForeground(new Color(112, 114, 113));
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 		
 		
 		JLabel peopleLabel = new JLabel("참가인원수");
-		peopleLabel.setForeground(new Color(112, 114, 113));
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 		
 		JLabel countLabel = new JLabel("60초");
-		countLabel.setForeground(new Color(112, 114, 113));
 		countLabel.setBounds(643, 21, 38, 16);
 		contentPanel.add(countLabel);
 		
 		JLabel gameTypeLabel = new JLabel("게임종류");
-		gameTypeLabel.setForeground(new Color(112, 114, 113));
 		gameTypeLabel.setBounds(431, 21, 61, 16);
 		contentPanel.add(gameTypeLabel);
 		
@@ -122,7 +126,7 @@ public class WordChainGameClientRoomView extends JFrame{
                 super.paintComponent(g);
             }
 		};
-		scorePanel.setBounds(42, 78, 450, 123);
+		scorePanel.setBounds(78, 78, 417, 113);
 		scorePanel.setLayout(null);
 		contentPanel.add(scorePanel);
 		
@@ -130,7 +134,7 @@ public class WordChainGameClientRoomView extends JFrame{
 		wordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		wordLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
 		wordLabel.setForeground(new Color(251, 255, 250));
-		wordLabel.setBounds(6, 56, 438, 50);
+		wordLabel.setBounds(6, 56, 405, 51);
 		scorePanel.add(wordLabel);
 		
 		JPanel timerPanel = new JPanel() {
@@ -152,10 +156,42 @@ public class WordChainGameClientRoomView extends JFrame{
 		
 		contentPanel.add(timerPanel);
 		
+		//이미지 버튼 추가
+		happyEmo = imageSetSize(happyEmo,30,30);
+		JButton happyemoButton = new JButton();
+		happyemoButton.setIcon(happyEmo);
+		happyemoButton.setBounds(6, 406, 35, 35);
+		contentPanel.add(happyemoButton);
 		
+		loveEmo = imageSetSize(loveEmo,30,30);
+		JButton loveButton = new JButton();
+		loveButton.setIcon(loveEmo);
+		loveButton.setBounds(42, 406, 35, 35);
+		contentPanel.add(loveButton);
 		
+		supriseEmo = imageSetSize(supriseEmo,30,30);
+		JButton supriseButton = new JButton();
+		supriseButton.setIcon(supriseEmo);
+		supriseButton.setBounds(78, 406, 35, 35);
+		contentPanel.add(supriseButton);
 		
+		sleepEmo = imageSetSize(sleepEmo,30,30);
+		JButton sleepeButton = new JButton();
+		sleepeButton.setIcon(sleepEmo);
+		sleepeButton.setBounds(114, 406, 35, 35);
+		contentPanel.add(sleepeButton);
 		
-		
+		AngryEmo = imageSetSize(AngryEmo,30,30);
+		JButton angryButton = new JButton();
+		angryButton.setIcon(AngryEmo);
+		angryButton.setBounds(150, 406, 35, 35);
+		contentPanel.add(angryButton);
+	}
+	
+	ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
+		Image ximg = icon.getImage();  //ImageIcon을 Image로 변환.
+		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon xyimg = new ImageIcon(yimg); 
+		return xyimg;
 	}
 }
