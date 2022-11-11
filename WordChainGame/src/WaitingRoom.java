@@ -60,8 +60,8 @@ import javax.swing.ListSelectionModel;
 
 public class WaitingRoom extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final int BUF_LEN = 128; // Windows Ã³·³ BUF_LEN À» Á¤ÀÇ
-	private Socket socket; // ¿¬°á¼ÒÄÏ
+	private static final int BUF_LEN = 128; // Windows ì²˜ëŸ¼ BUF_LEN ì„ ì •ì˜
+	private Socket socket; // ì—°ê²°ì†Œì¼“
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
@@ -93,7 +93,7 @@ public class WaitingRoom extends JFrame {
 		contentPanel = new JPanel() {
 			public void paintComponent(Graphics g) {
                 g.drawImage(introBackground, 0, 0, this.getWidth(), this.getHeight(), null);
-                setOpaque(false); // ±×¸²À» Ç¥½ÃÇÏ°Ô ¼³Á¤, Åõ¸íÇÏ°Ô Á¶Àı
+                setOpaque(false); // ê·¸ë¦¼ì„ í‘œì‹œí•˜ê²Œ ì„¤ì •, íˆ¬ëª…í•˜ê²Œ ì¡°ì ˆ
                 super.paintComponent(g);
             }
 		};
@@ -101,53 +101,53 @@ public class WaitingRoom extends JFrame {
 		setContentPane(contentPanel);
 		contentPanel.setLayout(null);
 		
-		// °ÔÀÓ ·Î°í ºÙÀÌ±â
-		gameLogo.setBorderPainted(false); // JButtonÀÇ border ¾ø¾Ö±â
-		gameLogo.setContentAreaFilled(false); // JButtonÀÇ ³»¿ë¿µ¿ª Ã¤¿ì±â ¾ÈÇÔ
-		gameLogo.setFocusPainted(false); // JButtonÀÌ ¼±ÅÃ µÇ¾úÀ» ¶§ »ı±â´Â Å×µÎ¸® ¾ø¾Ö±â
+		// ê²Œì„ ë¡œê³  ë¶™ì´ê¸°
+		gameLogo.setBorderPainted(false); // JButtonì˜ border ì—†ì• ê¸°
+		gameLogo.setContentAreaFilled(false); // JButtonì˜ ë‚´ìš©ì˜ì—­ ì±„ìš°ê¸° ì•ˆí•¨
+		gameLogo.setFocusPainted(false); // JButtonì´ ì„ íƒ ë˜ì—ˆì„ ë•Œ ìƒê¸°ëŠ” í…Œë‘ë¦¬ ì—†ì• ê¸°
 		gameLogo.setBounds(50, 10, logoImage.getIconWidth(), logoImage.getIconHeight());
 		contentPanel.add(gameLogo);
 
-		// ÇöÀç Á¢¼ÓÀÚ ¸®½ºÆ®
+		// í˜„ì¬ ì ‘ì†ì ë¦¬ìŠ¤íŠ¸
 		userScrollPane = new JScrollPane();
 		userScrollPane.setBounds(30, 150, 200, 250);
 		userList = new JList(fruits);
-		userList.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 12));
+		userList.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.PLAIN, 12));
 		userList.setToolTipText("\uAC8C\uC784\uC811\uC18D\uC790 \uBAA9\uB85D");
 		userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		userList.setBackground(SystemColor.control);
 		userScrollPane.setViewportView(userList);
 		contentPanel.add(userScrollPane);
 		
-		// »ç¿ëÀÚ ÇÁ·ÎÇÊ
+		// ì‚¬ìš©ì í”„ë¡œí•„
 		
 		
-		// ¹æ¸¸µé±â ¹öÆ°
-		startButton.setBorderPainted(false); // JButtonÀÇ border ¾ø¾Ö±â
-		startButton.setContentAreaFilled(false); // JButtonÀÇ ³»¿ë¿µ¿ª Ã¤¿ì±â ¾ÈÇÔ
-		startButton.setFocusPainted(false); // JButtonÀÌ ¼±ÅÃ µÇ¾úÀ» ¶§ »ı±â´Â Å×µÎ¸® ¾ø¾Ö±â
+		// ë°©ë§Œë“¤ê¸° ë²„íŠ¼
+		startButton.setBorderPainted(false); // JButtonì˜ border ì—†ì• ê¸°
+		startButton.setContentAreaFilled(false); // JButtonì˜ ë‚´ìš©ì˜ì—­ ì±„ìš°ê¸° ì•ˆí•¨
+		startButton.setFocusPainted(false); // JButtonì´ ì„ íƒ ë˜ì—ˆì„ ë•Œ ìƒê¸°ëŠ” í…Œë‘ë¦¬ ì—†ì• ê¸°
 		startButton.setBounds(23, 420, startButtonBasicImage.getIconWidth(), startButtonBasicImage.getIconHeight());
 		startButton.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseEntered(MouseEvent e) { // ¸¶¿ì½º°¡ ¹öÆ° À§·Î ¿Ã¶ó°¥ ¶§
+			public void mouseEntered(MouseEvent e) { // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ ìœ„ë¡œ ì˜¬ë¼ê°ˆ ë•Œ
 				startButton.setIcon(startButtonEnteredImage);
 				startButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
 			@Override
-			public void mouseExited(MouseEvent e) { // ¸¶¿ì½º°¡ ¹öÆ° ¹ÛÀ¸·Î ³ª°¥ ¶§
+			public void mouseExited(MouseEvent e) { // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ ë°–ìœ¼ë¡œ ë‚˜ê°ˆ ë•Œ
 				startButton.setIcon(startButtonBasicImage);
 				startButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 		contentPanel.add(startButton);
 
-		// ¹æ¸®½ºÆ®
-		roomL = new JLabel("°ÔÀÓ ¹æ ¸ñ·Ï");
+		// ë°©ë¦¬ìŠ¤íŠ¸
+		roomL = new JLabel("ê²Œì„ ë°© ëª©ë¡");
 		roomL.setBounds(254, 22, 128, 24);
-		roomL.setFont(new Font("³ª´®°íµñ", Font.BOLD, 20));
+		roomL.setFont(new Font("ë‚˜ëˆ”ê³ ë”•", Font.BOLD, 20));
 		contentPanel.add(roomL);
 		
-		roomlistPanel = new JPanel(new GridLayout(20, 1, 10, 10)); // 20°³
+		roomlistPanel = new JPanel(new GridLayout(20, 1, 10, 10)); // 20ê°œ
 		roomlistPanel.setBackground(Color.WHITE);
 		roomScrollPane = new JScrollPane(roomlistPanel);
 		roomScrollPane.setBounds(254, 48, 405, 582);
