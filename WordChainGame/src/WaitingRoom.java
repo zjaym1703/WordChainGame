@@ -154,5 +154,6 @@ public class WaitingRoom extends JFrame {
 		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		contentPanel.add(roomScrollPane);
 		
+
 	}
 }

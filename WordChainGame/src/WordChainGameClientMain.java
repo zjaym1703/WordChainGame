@@ -82,6 +82,7 @@ public class WordChainGameClientMain extends JFrame {
 		txtIpAddress.addActionListener(action);
 		txtPortNumber.addActionListener(action);
 	}
+	
 	class Myaction implements ActionListener { // 내부클래스로 액션 이벤트 처리 클래스
 		@Override
 		public void actionPerformed(ActionEvent e) {
