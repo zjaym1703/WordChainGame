@@ -7,6 +7,10 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -29,6 +33,7 @@ public class WordChainGameServer extends JFrame {
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
 	private Vector<String> EnterUserVec = new Vector<String>(); // 접속자 리스트를 저장하는 벡터
+	private HashMap<Integer,String> RoomUserMap = new HashMap<Integer,String>(); //룸 이름 입장된 사용자를 저장하는 map
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 	
 	public static void main(String[] args) {
@@ -137,6 +142,7 @@ public class WordChainGameServer extends JFrame {
 		private Vector user_vc;
 		public String UserName = "";
 		public String UserStatus;
+		public int UserScore;
 
 		public UserService(Socket client_socket) {
 			// 매개변수로 넘어온 자료 저장
@@ -182,7 +188,53 @@ public class WordChainGameServer extends JFrame {
 					user.EnterAlarmOne(tmp);
 			}
 		}	
+		
+		// 게임방 안의 user에게 알림
+		public void RoomAlarmAll(int roomNumber) {
+			AppendText("["+roomNumber+"] 방에 참가자 " + UserName + " 입장.");
+			
+			Vector<UserDTO> userList = new Vector<UserDTO>();
+			
+			Iterator<Integer> room = RoomUserMap.keySet().iterator();
+			while(room.hasNext()){
+			    int key = room.next();
+			    if(roomNumber == key) {
+			    	String user_name = RoomUserMap.get(key);
+			    	
+			    	int index = user_vc.indexOf(user_name);
+			    	UserService user = (UserService) user_vc.elementAt(index);
+			    	
+			    	userList.add(new UserDTO(user.UserName,user.UserScore,user.UserStatus));
+			    }
+			}
+			
 
+			while(room.hasNext()){
+			    int key = room.next();
+			    if(roomNumber == key) {
+			    	try {
+						ChatMsg obcm = new ChatMsg("Room", "301", userList);
+						oos.writeObject(obcm);
+					} catch (IOException e) {
+						AppendText("dos.writeObject() error");
+						try {
+							ois.close();
+							oos.close();
+							client_socket.close();
+							client_socket = null;
+							ois = null;
+							oos = null;
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+					}
+			    }
+			}
+			
+		}
+
+		
 		// 모든 User들에게 방송. 각각의 UserService Thread의 WriteOne() 을 호출한다.
 		public void WriteAll(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
@@ -374,7 +426,14 @@ public class WordChainGameServer extends JFrame {
 							UserStatus = "O";
 							WriteAllObject(cm);
 						}
-					} else if (cm.code.matches("400")) { // logout message 처리
+					} else if(cm.code.matches("301")) { // 게임룸 입장
+						AppendText("게임룸 입장");
+						UserScore = 0;
+						int room_number = 1;
+						RoomUserMap.put(room_number,cm.UserName); //방번호와 사용자 이름 저장 
+						RoomAlarmAll(room_number);
+					}
+					else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
 					} else { // 300, 500, ... 기타 object는 모두 방송한다.

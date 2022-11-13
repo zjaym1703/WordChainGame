@@ -115,6 +115,13 @@ public class WaitingRoom extends JFrame {
 //				setVisible(false);
 //			}
 		});
+		
+		startButton.addActionListener(new ActionListener(){ //익명클래스로 리스너 작성
+			public void actionPerformed(ActionEvent e){
+				WordChainGameClientRoomView view = new WordChainGameClientRoomView(userName,ip_addr,port_no);
+				setVisible(false);
+			}
+		});
 		contentPanel.add(startButton);
 
 		// 방리스트
@@ -182,7 +189,7 @@ public class WaitingRoom extends JFrame {
 						continue;
 					switch (cm.code) {
 					case "100": // 대기실에서 모든 접속자 인원
-						String enterUsers[] = cm.data.split(",");
+						String enterUsers[] = ((String)cm.data).split(",");
 						userList.setListData(enterUsers);
 						break;
 //					case "200": // chat message

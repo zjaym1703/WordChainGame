@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -49,6 +50,9 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
+	
+	private int userPanelX = 0;
+	private int userPanelY = 0;
 
 	// image
 	private Image background = new ImageIcon("images/background1.png").getImage();
@@ -95,7 +99,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			oos.flush();
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			ChatMsg obcm = new ChatMsg(username, "100", "Hello"); //임의로 설정해놓음, 추후에 변경해야함 
+			ChatMsg obcm = new ChatMsg(username, "301", "RoomName"); //임의로 설정해놓음, 추후에 변경해야함 
 			SendChatMsg(obcm);
 
 			ListenNetwork net = new ListenNetwork();
@@ -353,17 +357,10 @@ public class WordChainGameClientRoomView extends JFrame {
 		UserListPanel.setLayout(null);
 		UserListPanel.setBackground(new Color(0,0,0,0));
 		
-		int size = 6; //TODO : 추후에 변경하기 
-		int x =0, y=0;
-		
-		for(int i=0;i<size;i++) {
-			//
-			UserPanel user = new UserPanel(x,y);
-			user.setName("끄투");
-			user.setScore(1000);
-			UserListPanel.add(user);
-			
-		}
+		UserPanel user = new UserPanel(userPanelX,userPanelY);
+		user.setName("끄투");
+		user.setScore(1000);
+		UserListPanel.add(user);
 		
 		contentPanel.add(UserListPanel);
 	}
@@ -375,6 +372,17 @@ public class WordChainGameClientRoomView extends JFrame {
 		return xyimg;
 	}
 	
+	public void addUserPanel(Vector<UserDTO> list) {
+		for(int i=0;i<list.size();i++) {
+			UserPanel user = new UserPanel(userPanelX,userPanelY);
+			user.setName(list.get(i).getName());
+			user.setScore(list.get(i).getScore());
+			UserListPanel.add(user);
+			
+			userPanelX += user.WIDTH + 5;
+			userPanelX += user.HEIGHT;
+		}
+	}
 	public void SendChatMsg(ChatMsg obj) {
 		try {
 			oos.writeObject(obj.code);
@@ -419,11 +427,9 @@ public class WordChainGameClientRoomView extends JFrame {
 				case "200": // chat message
 					//AppendText(msg);
 					break;
-				case "300": // Image ÷��
-					//AppendText("[" + cm.UserName + "]" + " " + cm.data);
-					//AppendImage(cm.img);
-					//AppendImageBytes(cm.imgbytes);
-
+				case "301": // 게임룸 입장
+					Vector<UserDTO> userList = (Vector<UserDTO>) cm.data;
+					addUserPanel(userList);
 					break;
 				}
 
@@ -435,7 +441,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		Object obj = null;
 		String msg = null;
 		ChatMsg cm = new ChatMsg("", "", "");
-		// Android�� ȣȯ���� ���� ������ Field�� ���ε��� �д´�.
 
 			try {
 				obj = ois.readObject();
