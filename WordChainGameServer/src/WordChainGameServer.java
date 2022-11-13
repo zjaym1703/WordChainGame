@@ -28,6 +28,7 @@ public class WordChainGameServer extends JFrame {
 	private ServerSocket socket; // 서버소켓
 	private Socket client_socket; // accept() 에서 생성된 client 소켓
 	private Vector UserVec = new Vector(); // 연결된 사용자를 저장할 벡터
+	private Vector<String> EnterUserVec = new Vector<String>(); // 접속자 리스트를 저장하는 벡터
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 	
 	public static void main(String[] args) {
@@ -156,16 +157,33 @@ public class WordChainGameServer extends JFrame {
 			WriteOne(UserName + "님 환영합니다.\n"); // 연결된 사용자에게 정상접속을 알림
 			String msg = "[" + UserName + "]님이 입장 하였습니다.\n";
 			WriteOthers(msg); // 아직 user_vc에 새로 입장한 user는 포함되지 않았다.
+
+			EnterAlarmAll(); // 새로 접속한 유저 리스트 알림
 		}
 
 		public void Logout() {
 			String msg = "[" + UserName + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
+			EnterUserVec.remove(UserName);
 			WriteAll(msg); // 나를 제외한 다른 User들에게 전송
 			AppendText("사용자 " + "[" + UserName + "] 퇴장. 현재 참가자 수 " + UserVec.size());
+			EnterAlarmAll();
 		}
+		
+		// 모든 User들에게 방송. 각각의 UserService Thread의 EnterAlarmOne() 을 호출한다.
+		public void EnterAlarmAll() {
+			String tmp = "";
+			for(int i = 0; i < EnterUserVec.size(); i++) {
+				tmp += EnterUserVec.get(i) + ",";
+			}
+			for (int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
+				if (user.UserStatus == "O")
+					user.EnterAlarmOne(tmp);
+			}
+		}	
 
-		// 모든 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
+		// 모든 User들에게 방송. 각각의 UserService Thread의 WriteOne() 을 호출한다.
 		public void WriteAll(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
@@ -206,6 +224,27 @@ public class WordChainGameServer extends JFrame {
 			for (i = 0; i < bb.length; i++)
 				packet[i] = bb[i];
 			return packet;
+		}
+		
+		// 현재 접속자 리스트 전송
+		public void EnterAlarmOne(String msg) {
+			try {
+				ChatMsg obcm = new ChatMsg("Enter", "100", msg);
+				oos.writeObject(obcm);
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					ois.close();
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
 		}
 
 		// UserService Thread가 담당하는 Client 에게 1:1 전송
@@ -291,6 +330,7 @@ public class WordChainGameServer extends JFrame {
 						continue;
 					if (cm.code.matches("100")) {
 						UserName = cm.UserName;
+						EnterUserVec.add(cm.UserName); // 새로 들어온 유저를 접속자 리스트에 넣음
 						UserStatus = "O"; // Online 상태
 						Login();
 					} else if (cm.code.matches("200")) {

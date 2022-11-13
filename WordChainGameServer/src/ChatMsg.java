@@ -1,11 +1,12 @@
-// ChatMsg.java Ã¤ÆÃ ¸Þ½ÃÁö ObjectStream ¿ë.
+// ChatMsg.java ì±„íŒ… ë©”ì‹œì§€ ObjectStream ìš©.
 import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import javax.swing.ImageIcon;
 
 class ChatMsg implements Serializable {
 	private static final long serialVersionUID = 1L;
-	public String code; // 100:·Î±×ÀÎ, 400:·Î±×¾Æ¿ô, 200:Ã¤ÆÃ¸Þ½ÃÁö, 300:Image, 500: Mouse Event
+	// 100:ê²Œìž„ìž…ìž¥, 400:ë¡œê·¸ì•„ì›ƒ, 200:ì±„íŒ…ë©”ì‹œì§€, 300:Image, 500: Mouse Event
+	public String code;
 	public String UserName;
 	public String data;
 	public ImageIcon img;

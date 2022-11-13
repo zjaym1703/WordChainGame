@@ -68,6 +68,7 @@ public class WordChainGameClientRoomView extends JFrame{
 	 */
 	public WordChainGameClientRoomView() {
 		initialize();
+		setVisible(true);
 	}
 
 	/**
@@ -173,7 +174,6 @@ public class WordChainGameClientRoomView extends JFrame{
 		scoreLabel.setForeground(new Color(251, 255, 250));
 		scoreLabel.setBounds(6, 35, 108, 50);
 		timerPanel.add(scoreLabel);
-		
 		contentPanel.add(timerPanel);
 		
 		//이미지 버튼 추가
