@@ -109,11 +109,11 @@ public class WaitingRoom extends JFrame {
 				startButton.setIcon(startButtonBasicImage);
 				startButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
-			@Override
-			public void mousePressed(MouseEvent e) { // 마우스가 버튼을 눌렀을 때
-				WordChainGameClientRoomView game = new WordChainGameClientRoomView();
-				setVisible(false);
-			}
+//			@Override
+//			public void mousePressed(MouseEvent e) { // 마우스가 버튼을 눌렀을 때
+//				WordChainGameClientRoomView game = new WordChainGameClientRoomView();
+//				setVisible(false);
+//			}
 		});
 		contentPanel.add(startButton);
 

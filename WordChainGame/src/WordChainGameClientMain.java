@@ -90,6 +90,7 @@ public class WordChainGameClientMain extends JFrame {
 			String ip_addr = txtIpAddress.getText().trim();
 			String port_no = txtPortNumber.getText().trim();
 			WaitingRoom view = new WaitingRoom(nickname, ip_addr, port_no);
+//			WordChainGameClientRoomView view = new WordChainGameClientRoomView(nickname,ip_addr,port_no);
 			setVisible(false);
 		}
 	}
