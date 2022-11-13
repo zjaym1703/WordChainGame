@@ -122,6 +122,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		setTitle("kkutu");
 		setSize(700, 700);
 		setResizable(false);
+		setVisible(true);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
