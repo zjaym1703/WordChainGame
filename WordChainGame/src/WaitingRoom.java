@@ -40,7 +40,7 @@ public class WaitingRoom extends JFrame {
 	private JList<String> userList;
 	
 	private JPanel contentPanel, roomlistPanel;
-	private JLabel roomL;
+	private JLabel roomL, usernameL;
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -91,7 +91,10 @@ public class WaitingRoom extends JFrame {
 		contentPanel.add(userScrollPane);
 		
 		// 사용자 프로필
-		
+		usernameL = new JLabel();
+		usernameL.setBounds(125, 554, 105, 31);
+		usernameL.setFont(new Font("굴림", Font.BOLD, 15));
+		contentPanel.add(usernameL);
 		
 		// 방만들기 버튼
 		startButton.setBorderPainted(false); // JButton의 border 없애기
@@ -184,6 +187,7 @@ public class WaitingRoom extends JFrame {
 					case "100": // 대기실에서 모든 접속자 인원
 						String enterUsers[] = cm.data.split(",");
 						userList.setListData(enterUsers);
+						usernameL.setText(UserName);
 						break;
 //					case "200": // chat message
 //						if (cm.UserName.equals(UserName))
