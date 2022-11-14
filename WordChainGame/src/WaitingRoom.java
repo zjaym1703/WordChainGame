@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 
 import java.awt.SystemColor;
 import javax.swing.ListSelectionModel;
@@ -36,8 +37,11 @@ public class WaitingRoom extends JFrame {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
+//	private CreateRoom createRoom = null;
+//	private JFrame createRoomFrame = null; // 방 만들기 프레임
+	
 	private JScrollPane userScrollPane, roomScrollPane;
-	private JList<String> userList;
+	private JList<String> userList, roomList;
 	
 	private JPanel contentPanel, roomlistPanel;
 	private JLabel roomL, usernameL;
@@ -112,11 +116,6 @@ public class WaitingRoom extends JFrame {
 				startButton.setIcon(startButtonBasicImage);
 				startButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
-//			@Override
-//			public void mousePressed(MouseEvent e) { // 마우스가 버튼을 눌렀을 때
-//				WordChainGameClientRoomView game = new WordChainGameClientRoomView();
-//				setVisible(false);
-//			}
 		});
 		contentPanel.add(startButton);
 
@@ -125,12 +124,13 @@ public class WaitingRoom extends JFrame {
 		roomL.setBounds(254, 22, 128, 24);
 		roomL.setFont(new Font("나눔고딕", Font.BOLD, 20));
 		contentPanel.add(roomL);
-		
+		roomList = new JList<String>();
 		roomlistPanel = new JPanel(new GridLayout(20, 1, 10, 10)); // 20개
 		roomlistPanel.setBackground(Color.WHITE);
 		roomScrollPane = new JScrollPane(roomlistPanel);
 		roomScrollPane.setBounds(254, 48, 405, 582);
 		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		roomScrollPane.setViewportView(roomList);
 		contentPanel.add(roomScrollPane);
 		
 		try {
@@ -145,6 +145,8 @@ public class WaitingRoom extends JFrame {
 
 			ListenNetwork net = new ListenNetwork();
 			net.start();
+			RoomCreateAction roomCreateAction = new RoomCreateAction();
+			startButton.addActionListener(roomCreateAction);
 //			TextSendAction action = new TextSendAction();
 //			btnSend.addActionListener(action);
 //			txtInput.addActionListener(action);
@@ -183,11 +185,20 @@ public class WaitingRoom extends JFrame {
 						msg = String.format("[%s]\n%s", cm.UserName, cm.data);
 					} else
 						continue;
+					
 					switch (cm.code) {
 					case "100": // 대기실에서 모든 접속자 인원
-						String enterUsers[] = cm.data.split(",");
+						String [] enterUsers = cm.data.split(",");
 						userList.setListData(enterUsers);
 						usernameL.setText(UserName);
+						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
+							String [] title = cm.roomTitle.split(",");
+							roomList.setListData(title);
+						}
+						break;
+					case "302": // 게임 방 생성되면 리스트에 뿌리기
+						String [] title = cm.roomTitle.split(",");
+						roomList.setListData(title);
 						break;
 //					case "200": // chat message
 //						if (cm.UserName.equals(UserName))
@@ -217,8 +228,24 @@ public class WaitingRoom extends JFrame {
 						break;
 					} // catch문 끝
 				} // 바깥 catch문끝
-
 			}
+		}
+	}
+	
+	class RoomCreateAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String title = JOptionPane.showInputDialog(this, "방제목:");
+			SendCreateRoom(title);
+//			createRoom = new CreateRoom(createRoomFrame);
+//            createRoomFrame = new JFrame();
+//            createRoomFrame.setTitle("방 생성");
+//            createRoomFrame.setContentPane(createRoom);
+//            createRoomFrame.setBounds(100, 200, 310, 255);
+//            createRoomFrame.setVisible(true);
+//            createRoomFrame.setLocationRelativeTo(null);
+//            createRoomFrame.setResizable(false);
+            
 		}
 	}
 
@@ -384,6 +411,12 @@ public class WaitingRoom extends JFrame {
 		for (i = 0; i < bb.length; i++)
 			packet[i] = bb[i];
 		return packet;
+	}
+	
+	public void SendCreateRoom(String title) {
+		ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
+		obcm.roomTitle = title;
+		SendObject(obcm);
 	}
 
 	// Server에게 network으로 전송
