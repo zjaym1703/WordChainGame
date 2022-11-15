@@ -85,33 +85,33 @@ public class WordChainGameClientRoomView extends JFrame {
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView(String username, String ip_addr, String port_no) {
+	public WordChainGameClientRoomView(/*String username, String ip_addr, String port_no*/) {
 		initialize();
 		
-		try {
-			socket = new Socket(ip_addr, Integer.parseInt(port_no));
-
-			oos = new ObjectOutputStream(socket.getOutputStream());
-			oos.flush();
-			ois = new ObjectInputStream(socket.getInputStream());
-
-			ChatMsg obcm = new ChatMsg(username, "100", "Hello"); //임의로 설정해놓음, 추후에 변경해야함 
-			SendChatMsg(obcm);
-
-			ListenNetwork net = new ListenNetwork();
-			net.start();
-			//TextSendAction action = new TextSendAction();
-			//btnSend.addActionListener(action);
-			//txtInput.addActionListener(action);
-			//txtInput.requestFocus();
-			//ImageSendAction action2 = new ImageSendAction();
-			//imgBtn.addActionListener(action2);
-
-		} catch (NumberFormatException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			//AppendText("connect error");
-		}
+//		try {
+//			socket = new Socket(ip_addr, Integer.parseInt(port_no));
+//
+//			oos = new ObjectOutputStream(socket.getOutputStream());
+//			oos.flush();
+//			ois = new ObjectInputStream(socket.getInputStream());
+//
+//			ChatMsg obcm = new ChatMsg(username, "100", "Hello"); //임의로 설정해놓음, 추후에 변경해야함 
+//			SendChatMsg(obcm);
+//
+//			ListenNetwork net = new ListenNetwork();
+//			net.start();
+//			//TextSendAction action = new TextSendAction();
+//			//btnSend.addActionListener(action);
+//			//txtInput.addActionListener(action);
+//			//txtInput.requestFocus();
+//			//ImageSendAction action2 = new ImageSendAction();
+//			//imgBtn.addActionListener(action2);
+//
+//		} catch (NumberFormatException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			//AppendText("connect error");
+//		}
 
 	}
 	

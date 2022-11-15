@@ -2,17 +2,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,12 +42,18 @@ public class WaitingRoom extends JFrame {
 	
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
-	
+	private WordChainGameClientRoomView gameView = null;
 	private JScrollPane userScrollPane, roomScrollPane;
 	private JList<String> userList, roomList;
 	
 	private JPanel contentPanel, roomlistPanel;
 	private JLabel roomL, usernameL;
+	
+	// 수정하고 있는 부분
+	private String [] header = { "번호", "방 제목", "인원", "게임 유형", "라운드 수", "라운드 시간" };
+	private Vector<String> row; // 행 추가 하는 부분
+	private DefaultTableModel model = new DefaultTableModel(header, 0); // header데이터로 컬럼 모델 생성
+	//
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -132,6 +141,21 @@ public class WaitingRoom extends JFrame {
 		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		roomScrollPane.setViewportView(roomList);
 		contentPanel.add(roomScrollPane);
+
+		
+//		// 수정중인 부분
+//		JTable table = new JTable(model) {
+//			@Override
+//			public boolean isCellEditable(int row, int column) { // 수정 불가
+//				return false;
+//			}
+//		};
+//		roomScrollPane = new JScrollPane(table);
+//		roomScrollPane.setBounds(254, 48, 405, 582);
+//		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//		roomScrollPane.setViewportView(table);
+//		contentPanel.add(roomScrollPane);
+//		//
 		
 		try {
 			socket = new Socket(ip_addr, Integer.parseInt(port_no));
@@ -147,6 +171,8 @@ public class WaitingRoom extends JFrame {
 			net.start();
 			RoomCreateAction roomCreateAction = new RoomCreateAction();
 			startButton.addActionListener(roomCreateAction);
+			
+			
 //			TextSendAction action = new TextSendAction();
 //			btnSend.addActionListener(action);
 //			txtInput.addActionListener(action);
@@ -188,17 +214,39 @@ public class WaitingRoom extends JFrame {
 					
 					switch (cm.code) {
 					case "100": // 대기실에서 모든 접속자 인원
-						String [] enterUsers = cm.data.split(",");
+						String [] enterUsers = cm.data.split(","); // 모든 접속자들을 ,단위로 자르기
 						userList.setListData(enterUsers);
 						usernameL.setText(UserName);
 						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
 							String [] title = cm.roomTitle.split(",");
 							roomList.setListData(title);
 						}
+//						//추가한 부분
+//						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
+//							String [] title = cm.roomTitle.split(",");
+//							for(int i=0; i < title.length; i++) {
+//								row = new Vector<String>();
+//								row.addElement(title[i]);
+//							}
+//							model.addRow(row);
+//						}
+//						//
+						break;
+					case "301": // 방 입장하는 부분
+						System.out.println(UserName + "님이 방만들어서 입장함\n");
+//						setVisible(false);
+//						gameView.setVisible(true);
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
-						String [] title = cm.roomTitle.split(",");
+						String [] title = cm.roomTitle.split(",");	
 						roomList.setListData(title);
+//						// 추가한 부분
+//						for(int i=0; i < title.length; i++) {
+//							row = new Vector<String>();
+//							row.addElement(title[i]);
+//						}
+//						model.addRow(row);
+//						//
 						break;
 //					case "200": // chat message
 //						if (cm.UserName.equals(UserName))
@@ -235,8 +283,15 @@ public class WaitingRoom extends JFrame {
 	class RoomCreateAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String title = JOptionPane.showInputDialog(this, "방제목:");
-			SendCreateRoom(title);
+			String title = JOptionPane.showInputDialog("방제목을 입력하세요"); // 방 제목 입력받는 팝업창
+			
+			ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
+			obcm.roomTitle = title;
+			SendObject(obcm);
+			
+			// 방 만든 유저의 창을 닫고 게임방 입장
+			setVisible(false); 
+			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView();
 //			createRoom = new CreateRoom(createRoomFrame);
 //            createRoomFrame = new JFrame();
 //            createRoomFrame.setTitle("방 생성");
