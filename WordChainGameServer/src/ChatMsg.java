@@ -13,6 +13,8 @@ class ChatMsg implements Serializable {
 //	public MouseEvent mouse_e;
 //	public int pen_size; // pen size
 	public String roomTitle; // 방 이름
+	public int roomNumber; // 방 번호
+	public Room room;
 
 	public ChatMsg(String UserName, String code, String msg) {
 		this.code = code;
@@ -22,5 +24,16 @@ class ChatMsg implements Serializable {
 	
 	public void SetRoomTitle(String roomTitle) {
 		this.roomTitle = roomTitle;
+	}
+	
+	public void SetRoomNumber(int roomNumber) {
+		this.roomNumber = roomNumber;
+	}
+	
+	public void SetTest(Room room) {
+		this.room = room;
+		for(int i = 0; i < this.room.userVector.size(); i++) {
+			System.out.println("Server ChatMsg : " + this.room.userVector.get(i));
+		}
 	}
 }

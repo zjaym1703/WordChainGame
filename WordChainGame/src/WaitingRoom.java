@@ -42,7 +42,6 @@ public class WaitingRoom extends JFrame {
 	
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
-	private WordChainGameClientRoomView gameView = null;
 	private JScrollPane userScrollPane, roomScrollPane;
 	private JList<String> userList, roomList;
 	
@@ -141,7 +140,19 @@ public class WaitingRoom extends JFrame {
 		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		roomScrollPane.setViewportView(roomList);
 		contentPanel.add(roomScrollPane);
-
+		
+		roomList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JList list = (JList) e.getSource();
+				if(e.getClickCount() == 2) {
+					int index = list.locationToIndex(e.getPoint());
+					ChatMsg obcm = new ChatMsg(UserName, "301", UserName + " enter GameRoom");
+					obcm.SetRoomNumber(index);
+					SendObject(obcm);
+				}
+			}
+		});
 		
 //		// 수정중인 부분
 //		JTable table = new JTable(model) {
@@ -233,13 +244,19 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
-						System.out.println(UserName + "님이 방만들어서 입장함\n");
+						System.out.println(cm.room.userVector.size());
 //						setVisible(false);
 //						gameView.setVisible(true);
+						for(int i=0;i<cm.room.userVector.size();i++) {
+							System.out.println("들어온 사람 : " + cm.room.userVector.get(i));
+						}
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
-						String [] title = cm.roomTitle.split(",");	
-						roomList.setListData(title);
+						System.out.println("타이틀 : " + cm.roomTitle);
+						if(cm.roomTitle!=null) {
+							String [] title = cm.roomTitle.split(",");	
+							roomList.setListData(title);
+						}
 //						// 추가한 부분
 //						for(int i=0; i < title.length; i++) {
 //							row = new Vector<String>();
@@ -290,8 +307,8 @@ public class WaitingRoom extends JFrame {
 			SendObject(obcm);
 			
 			// 방 만든 유저의 창을 닫고 게임방 입장
-			setVisible(false); 
-			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView();
+			setVisible(false);
+			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView(); // 게임입장
 //			createRoom = new CreateRoom(createRoomFrame);
 //            createRoomFrame = new JFrame();
 //            createRoomFrame.setTitle("방 생성");
@@ -466,12 +483,6 @@ public class WaitingRoom extends JFrame {
 		for (i = 0; i < bb.length; i++)
 			packet[i] = bb[i];
 		return packet;
-	}
-	
-	public void SendCreateRoom(String title) {
-		ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
-		obcm.roomTitle = title;
-		SendObject(obcm);
 	}
 
 	// Server에게 network으로 전송
