@@ -2,17 +2,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -24,6 +27,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 
 import java.awt.SystemColor;
 import javax.swing.ListSelectionModel;
@@ -36,11 +40,19 @@ public class WaitingRoom extends JFrame {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
+//	private CreateRoom createRoom = null;
+//	private JFrame createRoomFrame = null; // 방 만들기 프레임
 	private JScrollPane userScrollPane, roomScrollPane;
-	private JList<String> userList;
+	private JList<String> userList, roomList;
 	
 	private JPanel contentPanel, roomlistPanel;
 	private JLabel roomL, usernameL;
+	
+	// 수정하고 있는 부분
+	private String [] header = { "번호", "방 제목", "인원", "게임 유형", "라운드 수", "라운드 시간" };
+	private Vector<String> row; // 행 추가 하는 부분
+	private DefaultTableModel model = new DefaultTableModel(header, 0); // header데이터로 컬럼 모델 생성
+	//
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -112,19 +124,15 @@ public class WaitingRoom extends JFrame {
 				startButton.setIcon(startButtonBasicImage);
 				startButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
-//			@Override
-//			public void mousePressed(MouseEvent e) { // 마우스가 버튼을 눌렀을 때
-//				WordChainGameClientRoomView game = new WordChainGameClientRoomView();
-//				setVisible(false);
-//			}
 		});
 		
-		startButton.addActionListener(new ActionListener(){ //익명클래스로 리스너 작성
-			public void actionPerformed(ActionEvent e){
-				WordChainGameClientRoomView view = new WordChainGameClientRoomView(userName,ip_addr,port_no);
-				setVisible(false);
-			}
-		});
+		// 나중에 지울지말지?? 312번째줄
+//		startButton.addActionListener(new ActionListener(){ //익명클래스로 리스너 작성
+//			public void actionPerformed(ActionEvent e){
+//				WordChainGameClientRoomView view = new WordChainGameClientRoomView(userName,ip_addr,port_no);
+//				setVisible(false);
+//			}
+//		});
 		contentPanel.add(startButton);
 
 		// 방리스트
@@ -132,13 +140,41 @@ public class WaitingRoom extends JFrame {
 		roomL.setBounds(254, 22, 128, 24);
 		roomL.setFont(new Font("나눔고딕", Font.BOLD, 20));
 		contentPanel.add(roomL);
-		
+		roomList = new JList<String>();
 		roomlistPanel = new JPanel(new GridLayout(20, 1, 10, 10)); // 20개
 		roomlistPanel.setBackground(Color.WHITE);
 		roomScrollPane = new JScrollPane(roomlistPanel);
 		roomScrollPane.setBounds(254, 48, 405, 582);
 		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		roomScrollPane.setViewportView(roomList);
 		contentPanel.add(roomScrollPane);
+		
+		roomList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JList list = (JList) e.getSource();
+				if(e.getClickCount() == 2) {
+					int index = list.locationToIndex(e.getPoint());
+					ChatMsg obcm = new ChatMsg(UserName, "301", UserName + " enter GameRoom");
+					obcm.SetRoomNumber(index);
+					SendObject(obcm);
+				}
+			}
+		});
+		
+//		// 수정중인 부분
+//		JTable table = new JTable(model) {
+//			@Override
+//			public boolean isCellEditable(int row, int column) { // 수정 불가
+//				return false;
+//			}
+//		};
+//		roomScrollPane = new JScrollPane(table);
+//		roomScrollPane.setBounds(254, 48, 405, 582);
+//		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+//		roomScrollPane.setViewportView(table);
+//		contentPanel.add(roomScrollPane);
+//		//
 		
 		try {
 			socket = new Socket(ip_addr, Integer.parseInt(port_no));
@@ -152,6 +188,10 @@ public class WaitingRoom extends JFrame {
 
 			ListenNetwork net = new ListenNetwork();
 			net.start();
+			RoomCreateAction roomCreateAction = new RoomCreateAction();
+			startButton.addActionListener(roomCreateAction);
+			
+			
 //			TextSendAction action = new TextSendAction();
 //			btnSend.addActionListener(action);
 //			txtInput.addActionListener(action);
@@ -190,11 +230,49 @@ public class WaitingRoom extends JFrame {
 						msg = String.format("[%s]\n%s", cm.UserName, cm.data);
 					} else
 						continue;
+					
 					switch (cm.code) {
 					case "100": // 대기실에서 모든 접속자 인원
-						String enterUsers[] = ((String)cm.data).split(",");
+						String [] enterUsers = cm.data.split(","); // 모든 접속자들을 ,단위로 자르기
+
 						userList.setListData(enterUsers);
 						usernameL.setText(UserName);
+						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
+							String [] title = cm.roomTitle.split(",");
+							roomList.setListData(title);
+						}
+//						//추가한 부분
+//						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
+//							String [] title = cm.roomTitle.split(",");
+//							for(int i=0; i < title.length; i++) {
+//								row = new Vector<String>();
+//								row.addElement(title[i]);
+//							}
+//							model.addRow(row);
+//						}
+//						//
+						break;
+					case "301": // 방 입장하는 부분
+						System.out.println(cm.room.userVector.size());
+//						setVisible(false);
+//						gameView.setVisible(true);
+						for(int i=0;i<cm.room.userVector.size();i++) {
+							System.out.println("들어온 사람 : " + cm.room.userVector.get(i));
+						}
+						break;
+					case "302": // 게임 방 생성되면 리스트에 뿌리기
+						System.out.println("타이틀 : " + cm.roomTitle);
+						if(cm.roomTitle!=null) {
+							String [] title = cm.roomTitle.split(",");	
+							roomList.setListData(title);
+						}
+//						// 추가한 부분
+//						for(int i=0; i < title.length; i++) {
+//							row = new Vector<String>();
+//							row.addElement(title[i]);
+//						}
+//						model.addRow(row);
+//						//
 						break;
 //					case "200": // chat message
 //						if (cm.UserName.equals(UserName))
@@ -224,8 +302,31 @@ public class WaitingRoom extends JFrame {
 						break;
 					} // catch문 끝
 				} // 바깥 catch문끝
-
 			}
+		}
+	}
+	
+	class RoomCreateAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String title = JOptionPane.showInputDialog("방제목을 입력하세요"); // 방 제목 입력받는 팝업창
+			
+			ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
+			obcm.roomTitle = title;
+			SendObject(obcm);
+			
+			// 방 만든 유저의 창을 닫고 게임방 입장
+			setVisible(false);
+			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView(); // 게임입장
+//			createRoom = new CreateRoom(createRoomFrame);
+//            createRoomFrame = new JFrame();
+//            createRoomFrame.setTitle("방 생성");
+//            createRoomFrame.setContentPane(createRoom);
+//            createRoomFrame.setBounds(100, 200, 310, 255);
+//            createRoomFrame.setVisible(true);
+//            createRoomFrame.setLocationRelativeTo(null);
+//            createRoomFrame.setResizable(false);
+            
 		}
 	}
 
