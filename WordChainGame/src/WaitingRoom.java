@@ -35,7 +35,7 @@ import javax.swing.ListSelectionModel;
 public class WaitingRoom extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
-	private String UserName;
+	public String UserName;
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
@@ -66,6 +66,7 @@ public class WaitingRoom extends JFrame {
 	
 	public WaitingRoom(String userName, String ip_addr, String port_no)  {
 		this.UserName = userName;
+		this.waitingRoom = this;
 		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -278,6 +279,15 @@ public class WaitingRoom extends JFrame {
 					case "307": // 사용자 입장 알림 받음
 						gameRoomView.addUser((String)cm.data);
 						break;
+					case "200":
+						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
+						
+						if(cm.UserName.equals(UserName)) {
+							gameRoomView.AppendTextColor(msg,Color.RED);
+						}else {
+							gameRoomView.AppendText(msg);
+						}
+						break;
 					}
 				} catch (IOException e) {
 //					AppendText("ois.readObject() error");
@@ -291,6 +301,31 @@ public class WaitingRoom extends JFrame {
 					} // catch문 끝
 				} // 바깥 catch문끝
 			}
+		}
+	}
+	
+	public void SendChatMsg(ChatMsg obj) {
+		System.out.println(obj.UserName+" : "+obj.data);
+		try {
+			oos.writeObject(obj);
+			if (obj.code.equals("300")) { 
+				//oos.writeObject(obj.imgbytes);
+			}
+			oos.flush();
+		} catch (IOException e) {
+			//AppendText("SendChatMsg Error");
+			e.printStackTrace();
+			try {
+				oos.close();
+				socket.close();
+				ois.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// textArea.append("�޼��� �۽� ����!!\n");
+			// System.exit(0);
 		}
 	}
 

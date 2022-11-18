@@ -23,7 +23,12 @@ import java.util.Vector;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -49,12 +54,11 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	private WaitingRoom waitingRoom;
 	private String data;
+	private int roomNumber = 1;
+	private String roomName = "";
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
-	
-	private int userPanelX = 0;
-	private int userPanelY = 0;
 
 	// image
 	private Image background = new ImageIcon("images/background1.png").getImage();
@@ -73,7 +77,8 @@ public class WordChainGameClientRoomView extends JFrame {
 	private ImageIcon gameStartButtonEnteredImage = new ImageIcon("images/gameStartButtonEntered.png");
 	private JButton sendButton = new JButton(sendButtonBasicImage);
 
-	private JTextField textField;
+	private JTextField textInputField;
+	private JTextPane textArea;
 
 //	public static void main(String[] args) {
 //		EventQueue.invokeLater(new Runnable() {
@@ -94,42 +99,29 @@ public class WordChainGameClientRoomView extends JFrame {
 	public WordChainGameClientRoomView(WaitingRoom waitingRoom ,String data){
 		this.waitingRoom = waitingRoom;
 		this.data = data;
-		System.out.println("wordChain"+data);
-//		if (waitingRoom != null) {
-//			ChatMsg obcm = new ChatMsg("", "160", "UserInfo Request");
-//			waitingRoom.SendObject(obcm);
-//		}
-		
-		System.out.println();
+		System.out.print("waiting : "+waitingRoom.UserName);
+		//1#hi#2#0#user1@user2@
+		String d[]=data.split("#");
+		this.roomNumber = Integer.parseInt(d[0]);
+		this.roomName = d[1];
 		initialize();
 		
-//		try {
-//			socket = new Socket(ip_addr, Integer.parseInt(port_no));
-//
-//			oos = new ObjectOutputStream(socket.getOutputStream());
-//			oos.flush();
-//			ois = new ObjectInputStream(socket.getInputStream());
-//
-//			ChatMsg obcm = new ChatMsg(username, "301", "RoomName"); //임의로 설정해놓음, 추후에 변경해야함 
-//			SendChatMsg(obcm);
-//
-//			ListenNetwork net = new ListenNetwork();
-//			net.start();
-//			//TextSendAction action = new TextSendAction();
-//			//btnSend.addActionListener(action);
-//			//txtInput.addActionListener(action);
-//			//txtInput.requestFocus();
-//			//ImageSendAction action2 = new ImageSendAction();
-//			//imgBtn.addActionListener(action2);
-//
-//		} catch (NumberFormatException | IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			//AppendText("connect error");
-//		}
-
+		initListener();
+		
 	}
 	
+	private void initListener() {
+		TextSendAction action = new TextSendAction();
+		sendButton.addActionListener(action);
+		textInputField.addActionListener(action);
+		textInputField.requestFocus();
+		//ImageSendAction action2 = new ImageSendAction();
+		//imgBtn.addActionListener(action2);
+	}
+	
+	public void userSetting(String name) {
+		
+	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -160,11 +152,16 @@ public class WordChainGameClientRoomView extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("채팅");
 		chattingScrollPane.setColumnHeaderView(lblNewLabel);
+		
+		textArea = new JTextPane();
+		textArea.setBounds(0, 0, 1, 16);
+		textArea.setEditable(true);
+		chattingScrollPane.setViewportView(textArea);
 
-		textField = new JTextField();
-		textField.setBounds(6, 625, 590, 34);
-		contentPanel.add(textField);
-		textField.setColumns(10);
+		textInputField = new JTextField();
+		textInputField.setBounds(6, 625, 590, 34);
+		contentPanel.add(textInputField);
+		textInputField.setColumns(10);
 
 		sendButton.setBorderPainted(false);
 		sendButton.setContentAreaFilled(false);
@@ -185,7 +182,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		});
 		contentPanel.add(sendButton);
 
-		JLabel roomNameLabel = new JLabel("RoomName");
+		JLabel roomNameLabel = new JLabel(this.roomName);
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 
@@ -233,10 +230,8 @@ public class WordChainGameClientRoomView extends JFrame {
 		scoreLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
 		scoreLabel.setForeground(new Color(251, 255, 250));
 		scoreLabel.setBounds(6, 15, 58, 49);
-		Thread threadNum = new Thread(scoreLabel);
-		threadNum.start();
+		
 		timerPanel.add(scoreLabel);
-		contentPanel.add(timerPanel);
 
 		// 이미지 버튼 추가
 		happyEmo = imageSetSize(happyEmo, 30, 30);
@@ -297,6 +292,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				supriseButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+		
 		contentPanel.add(supriseButton);
 
 		sleepEmo = imageSetSize(sleepEmo, 30, 30);
@@ -360,6 +356,15 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		});
 
+		gameStartBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Thread threadNum = new Thread(scoreLabel);
+				threadNum.start();
+			}
+			
+		});
 		contentPanel.add(gameStartBtn);
 		
 //		//사용자리스트 
@@ -399,6 +404,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 			addUserPanel(user);
 		}
+		
 	}
 	
 	public void addUserPanel(Vector<UserDTO> list) {
@@ -417,6 +423,33 @@ public class WordChainGameClientRoomView extends JFrame {
 		}
 		contentPanel.revalidate();
 		contentPanel.repaint();
+	}
+	
+	// 화면에 출력
+	public void AppendText(String msg) {
+		// textArea.append(msg + "\n");
+		// AppendIcon(icon1);
+		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
+		int len = textArea.getDocument().getLength();
+		// 끝으로 이동
+		textArea.setCaretPosition(len);
+		textArea.replaceSelection(msg + "\n");
+	}
+		
+	public void AppendTextColor(String msg,Color c) {
+		//색상 선택 
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+        
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+        
+		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
+		int len = textArea.getDocument().getLength();
+		// 끝으로 이동
+		textArea.setCaretPosition(len);
+		textArea.setCharacterAttributes(aset,false);
+		textArea.replaceSelection(msg + "\n");
+		
 	}
 	
 	public void SendChatMsg(ChatMsg obj) {
@@ -445,32 +478,31 @@ public class WordChainGameClientRoomView extends JFrame {
 		}
 	}
 	
-	class ListenNetwork extends Thread {
-		public void run() {
-			while (true) {
-				ChatMsg cm = ReadChatMsg();
-				if (cm==null)
-					break;
-				if (socket == null)
-					break;
-				String msg;
-				msg = String.format("[%s] %s", cm.UserName, cm.data);
-				switch (cm.code) {
-				case "100":
-					//사용자 list 받음 
-				case "200": // chat message
-					//AppendText(msg);
-					break;
-				case "301": // 게임룸 입장
-//					Vector<UserDTO> userList = (Vector<UserDTO>) cm.data;
-//					addUserPanel(userList);
-					break;
-				}
-
+	// keyboard enter key 치면 서버로 전송
+	class TextSendAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// Send button을 누르거나 메시지 입력하고 Enter key 치면
+			if (e.getSource() == sendButton || e.getSource() == textInputField) {
+				String msg = null;
+				 msg = textInputField.getText();
+				 System.out.println("메시지 전송 : "+msg);
+				 SendMessage(msg);
+				 textInputField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
+				 textInputField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
+				if (msg.contains("/exit")) // 종료 처리
+					System.exit(0);
 			}
 		}
 	}
 	
+	// Server에게 network으로 전송
+	public void SendMessage(String msg) {
+		ChatMsg obcm = new ChatMsg(waitingRoom.UserName, "200", msg);
+		obcm.SetRoomNumber(roomNumber);
+		waitingRoom.SendChatMsg(obcm);
+	}
+		
 	public ChatMsg ReadChatMsg() {
 		Object obj = null;
 		String msg = null;
