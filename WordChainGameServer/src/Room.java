@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.util.Vector;
 
 public class Room implements Serializable {
 	public int roomNumber = 0; // 방 번호

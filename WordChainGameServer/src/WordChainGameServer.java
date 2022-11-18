@@ -191,32 +191,20 @@ public class WordChainGameServer extends JFrame {
 			tmp += myRoom.userList;
 			
 			String [] users = myRoom.userList.split("@");
-//			for (int i = 0; i < user_vc.size() ; i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				for(int j = 0; j < users.length; j++) {
-//					if(users[j].equals(user.UserName)) {
-//						if (user.UserStatus == "O") {
-//							user.GameRoomEnterAlarmOne(tmp);
-//							break;
-//						}
-//					}
-//				}
-//			}
 			//room.userList에 마지막인자 == 최근입장한 사람 -> 301 호
-			for(int i=0;i<user_vc.size();i++) {
+			for(int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i); // 가장 최근에 들어온 사람
-				for(int j=0;j<users.length;j++) {
-					if(user.UserName.equals(users[users.length-1])) {
-						System.out.println("user : "+users[users.length-1]);
+				for(int j = 0; j < users.length; j++) {
+					if(user.UserName.equals(users[users.length - 1])) {
+						System.out.println("user : " + users[users.length - 1]);
 						user.GameRoomEnterAlarmOne("create", tmp);
 						break;
-					}else if(user.UserName.equals(users[j])){
+					} else if(user.UserName.equals(users[j])){
 						user.GameRoomEnterAlarmOne("noti", tmp);
 						break;
 					}
 				}
 			}
-			
 			
 		}
 		
@@ -310,13 +298,13 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		
-		public void GameRoomEnterAlarmOne(String type,String msg) {
+		public void GameRoomEnterAlarmOne(String type, String msg) {
 			try {
 				if(type.equals("create")) {
 					ChatMsg r_ob = new ChatMsg(UserName, "301", msg);
 					oos.writeObject(r_ob);
-				}else {
-					System.out.println("307메시지 : "+msg);
+				} else {
+					System.out.println("307메시지 : " + msg);
 					ChatMsg r_ob = new ChatMsg(UserName, "307", msg);
 					oos.writeObject(r_ob);
 				}
@@ -487,9 +475,6 @@ public class WordChainGameServer extends JFrame {
 							UserStatus = "O";
 							WriteAllObject(cm);
 						}
-					} else if(cm.code.matches("160")) { // 사람 들어올 때 마다 방 정보 요청
-//						System.out.println(cm.UserName + ",");
-						break;
 					} else if(cm.code.matches("301")) { // 방 입장
 						for(int i = 0; i < RoomVec.size(); i++) {
 							Room room = RoomVec.get(i);
@@ -521,10 +506,13 @@ public class WordChainGameServer extends JFrame {
 						CreateRoomAlarmAll(); // 대기실에 있는 유저들에게 방정보 출력
 						GameRoomEnterAlarm(myRoom);
 						break;
-					}else if (cm.code.matches("400")) { // logout message 처리
+					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
-					} else { // 300, 500, ... 기타 object는 모두 방송한다.
+					} else if (cm.code.matches("401")) { // 퇴장 처리
+						
+					}
+					else { // 300, 500, ... 기타 object는 모두 방송한다.
 						WriteAllObject(cm);
 					} 
 				} catch (IOException e) {

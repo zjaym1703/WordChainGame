@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -24,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -38,16 +40,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 
 public class WordChainGameClientRoomView extends JFrame {
+	private static final long serialVersionUID = 1L;
 
 	private final int second = 30;
 	
-	private Socket socket;
-	private InputStream is;
-	private OutputStream os;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
-	
 	private WaitingRoom waitingRoom;
+	private String data;
+	private String UserName;
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
@@ -70,64 +69,25 @@ public class WordChainGameClientRoomView extends JFrame {
 	private ImageIcon sendButtonEnteredImage = new ImageIcon("images/sendButtonEntered.png");
 	private ImageIcon gameStartButtonBasicImage = new ImageIcon("images/gameStartButtonBasic.png");
 	private ImageIcon gameStartButtonEnteredImage = new ImageIcon("images/gameStartButtonEntered.png");
+	
 	private JButton sendButton = new JButton(sendButtonBasicImage);
+	
+	private ImageIcon exitButtonBasicImage = new ImageIcon("images/exitBasicButton.png");
+	private JButton exitButton = new JButton(exitButtonBasicImage);
+	private ImageIcon exitButtonEnteredImage = new ImageIcon("images/exitEnteredButton.png");
 
 	private JTextField textField;
 
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					WordChainGameClientRoomView window = new WordChainGameClientRoomView();
-//					window.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
-	/**
-	 * Create the application.
-	 */
-	public WordChainGameClientRoomView(){
-//		this.waitingRoom = waitingRoom;
-//		if (waitingRoom != null) {
-//			ChatMsg obcm = new ChatMsg("", "160", "UserInfo Request");
-//			waitingRoom.SendObject(obcm);
-//		}
+	
+	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName){
+		this.waitingRoom = waitingRoom;
+		this.UserName = userName;
+		// data => 방번호#방제목#들어온 인원수#점수#user1@user2@
+		this.data = data;
 		
-		System.out.println();
 		initialize();
-		
-//		try {
-//			socket = new Socket(ip_addr, Integer.parseInt(port_no));
-//
-//			oos = new ObjectOutputStream(socket.getOutputStream());
-//			oos.flush();
-//			ois = new ObjectInputStream(socket.getInputStream());
-//
-//			ChatMsg obcm = new ChatMsg(username, "301", "RoomName"); //임의로 설정해놓음, 추후에 변경해야함 
-//			SendChatMsg(obcm);
-//
-//			ListenNetwork net = new ListenNetwork();
-//			net.start();
-//			//TextSendAction action = new TextSendAction();
-//			//btnSend.addActionListener(action);
-//			//txtInput.addActionListener(action);
-//			//txtInput.requestFocus();
-//			//ImageSendAction action2 = new ImageSendAction();
-//			//imgBtn.addActionListener(action2);
-//
-//		} catch (NumberFormatException | IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			//AppendText("connect error");
-//		}
-
 	}
 	
-
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -181,6 +141,24 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		});
 		contentPanel.add(sendButton);
+		
+		exitButton.setBorderPainted(false);
+		exitButton.setContentAreaFilled(false);
+		exitButton.setFocusPainted(false);
+		exitButton.setBounds(585, 400, exitButtonBasicImage.getIconWidth(), exitButtonBasicImage.getIconHeight());
+		exitButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) { // 마우스가 버튼 위로 올라갈 때
+				exitButton.setIcon(exitButtonEnteredImage);
+				exitButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) { // 마우스가 버튼 밖으로 나갈 때
+				exitButton.setIcon(exitButtonBasicImage);
+				exitButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		contentPanel.add(exitButton);
 
 		JLabel roomNameLabel = new JLabel("RoomName");
 		roomNameLabel.setBounds(17, 21, 135, 16);
@@ -349,15 +327,14 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setIcon(gameStartButtonEnteredImage);
 				gameStartBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
-
 			@Override
 			public void mouseExited(MouseEvent e) { // 마우스가 버튼 밖으로 나갈 때
 				gameStartBtn.setIcon(gameStartButtonBasicImage);
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-
 		contentPanel.add(gameStartBtn);
+		
 		
 		//사용자리스트 
 		UserListPanel = new JPanel();
@@ -369,8 +346,25 @@ public class WordChainGameClientRoomView extends JFrame {
 		user.setName("끄투");
 		user.setScore(1000);
 		UserListPanel.add(user);
-		
 		contentPanel.add(UserListPanel);
+		
+		
+		RoomExitCreateAction roomExitCreateAction = new RoomExitCreateAction();
+		exitButton.addActionListener(roomExitCreateAction);
+		
+		revalidate();
+		repaint();
+	}
+	
+	class RoomExitCreateAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String roomNumber = data.split("#")[0]; // 방 번호 입력받아서
+			int roomNum = Integer.parseInt(roomNumber); // int형으로 바꿈
+			ChatMsg obcm = new ChatMsg(UserName, "401", "Exit Room");
+			obcm.SetRoomNumber(roomNum);
+//			waitingRoom.SendObject(obcm);
+		}
 	}
 
 	ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
@@ -391,107 +385,105 @@ public class WordChainGameClientRoomView extends JFrame {
 			userPanelX += user.HEIGHT;
 		}
 	}
-	public void SendChatMsg(ChatMsg obj) {
-		try {
-			oos.writeObject(obj.code);
-			oos.writeObject(obj.UserName);
-			oos.writeObject(obj.data);
-			if (obj.code.equals("300")) { 
-				//oos.writeObject(obj.imgbytes);
-			}
-			oos.flush();
-		} catch (IOException e) {
-			//AppendText("SendChatMsg Error");
-			e.printStackTrace();
-			try {
-				oos.close();
-				socket.close();
-				ois.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			// textArea.append("�޼��� �۽� ����!!\n");
-			// System.exit(0);
-		}
-	}
-	
-	
-	
-	class ListenNetwork extends Thread {
-		public void run() {
-			while (true) {
-				ChatMsg cm = ReadChatMsg();
-				if (cm==null)
-					break;
-				if (socket == null)
-					break;
-				String msg;
-				msg = String.format("[%s] %s", cm.UserName, cm.data);
-				switch (cm.code) {
-				case "100":
-					//사용자 list 받음 
-				case "200": // chat message
-					//AppendText(msg);
-					break;
-				case "301": // 게임룸 입장
-//					Vector<UserDTO> userList = (Vector<UserDTO>) cm.data;
-//					addUserPanel(userList);
-					break;
-				}
-
-			}
-		}
-	}
-	
-	public ChatMsg ReadChatMsg() {
-		Object obj = null;
-		String msg = null;
-		ChatMsg cm = new ChatMsg("", "", "");
-
-			try {
-				obj = ois.readObject();
-				cm.code = (String) obj;
-				obj = ois.readObject();
-				cm.UserName = (String) obj;
-				obj = ois.readObject();
-				cm.data = (String) obj;
-				if (cm.code.equals("300")) {
-					obj = ois.readObject();
-					//cm.imgbytes = (byte[]) obj;
-				}
-			} catch (ClassNotFoundException | IOException e) {
-				// TODO Auto-generated catch block
-				//AppendText("ReadChatMsg Error");
-				e.printStackTrace();
-				try {
-					oos.close();
-					socket.close();
-					ois.close();
-					socket = null;
-					return null;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					try {
-						oos.close();
-						socket.close();
-						ois.close();
-					} catch (IOException e2) {
-						e2.printStackTrace();
-					}
-
-					socket = null;
-					return null;
-				}
-
-				// textArea.append("�޼��� �۽� ����!!\n");
-				// System.exit(0);
-			}
-
-
-		return cm;
-	}
+//	public void SendChatMsg(ChatMsg obj) {
+//		try {
+//			oos.writeObject(obj.code);
+//			oos.writeObject(obj.UserName);
+//			oos.writeObject(obj.data);
+//			if (obj.code.equals("300")) { 
+//				//oos.writeObject(obj.imgbytes);
+//			}
+//			oos.flush();
+//		} catch (IOException e) {
+//			//AppendText("SendChatMsg Error");
+//			e.printStackTrace();
+//			try {
+//				oos.close();
+//				socket.close();
+//				ois.close();
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
+//
+//			// textArea.append("�޼��� �۽� ����!!\n");
+//			// System.exit(0);
+//		}
+//	}
+//	
+//	
+//	
+//	class ListenNetwork extends Thread {
+//		public void run() {
+//			while (true) {
+//				ChatMsg cm = ReadChatMsg();
+//				if (cm==null)
+//					break;
+//				if (socket == null)
+//					break;
+//				String msg;
+//				msg = String.format("[%s] %s", cm.UserName, cm.data);
+//				switch (cm.code) {
+//				case "100":
+//					//사용자 list 받음 
+//				case "200": // chat message
+//					//AppendText(msg);
+//					break;
+//				case "301": // 게임룸 입장
+////					Vector<UserDTO> userList = (Vector<UserDTO>) cm.data;
+////					addUserPanel(userList);
+//					break;
+//				}
+//
+//			}
+//		}
+//	}
+//	
+//	public ChatMsg ReadChatMsg() {
+//		Object obj = null;
+//		String msg = null;
+//		ChatMsg cm = new ChatMsg("", "", "");
+//
+//			try {
+//				obj = ois.readObject();
+//				cm.code = (String) obj;
+//				obj = ois.readObject();
+//				cm.UserName = (String) obj;
+//				obj = ois.readObject();
+//				cm.data = (String) obj;
+//				if (cm.code.equals("300")) {
+//					obj = ois.readObject();
+//					//cm.imgbytes = (byte[]) obj;
+//				}
+//			} catch (ClassNotFoundException | IOException e) {
+//				//AppendText("ReadChatMsg Error");
+//				e.printStackTrace();
+//				try {
+//					oos.close();
+//					socket.close();
+//					ois.close();
+//					socket = null;
+//					return null;
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//					try {
+//						oos.close();
+//						socket.close();
+//						ois.close();
+//					} catch (IOException e2) {
+//						e2.printStackTrace();
+//					}
+//
+//					socket = null;
+//					return null;
+//				}
+//
+//				// textArea.append("�޼��� �۽� ����!!\n");
+//				// System.exit(0);
+//			}
+//
+//
+//		return cm;
+//	}
 	
 
 	class TimerLabel extends JLabel implements Runnable {

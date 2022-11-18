@@ -127,14 +127,6 @@ public class WaitingRoom extends JFrame {
 				startButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		
-		// 나중에 지울지말지?? 312번째줄
-//		startButton.addActionListener(new ActionListener(){ //익명클래스로 리스너 작성
-//			public void actionPerformed(ActionEvent e){
-//				WordChainGameClientRoomView view = new WordChainGameClientRoomView(userName,ip_addr,port_no);
-//				setVisible(false);
-//			}
-//		});
 		contentPanel.add(startButton);
 
 		// 방리스트
@@ -163,6 +155,9 @@ public class WaitingRoom extends JFrame {
 				}
 			}
 		});
+		
+		revalidate();
+		repaint();
 		
 //		// 수정중인 부분
 //		JTable table = new JTable(model) {
@@ -255,11 +250,9 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
-						String [] enterGameUsers = cm.data.split("#");
-						System.out.println(cm.data + "\n");
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
-						view = new WordChainGameClientRoomView(); // 게임입장
+						view = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
@@ -276,8 +269,11 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "307": // 사용자 입장 알림 받음
-						System.out.println("307 response : "+cm.data + "\n");
 						// 유저에게 메시지 전달 
+//						view.Test(cm);
+						break;
+					case "401": // 유저 퇴장
+						
 						break;
 					}
 				} catch (IOException e) {
@@ -302,10 +298,6 @@ public class WaitingRoom extends JFrame {
 			ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
 			obcm.roomTitle = title;
 			SendObject(obcm);
-//			
-//			// 방 만든 유저의 창을 닫고 게임방 입장
-//			setVisible(false);
-//			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView(waitingRoom); // 게임입장
 			
 			
 //			createRoom = new CreateRoom(createRoomFrame);
