@@ -47,6 +47,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
+	private WaitingRoom waitingRoom;
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
@@ -89,7 +90,12 @@ public class WordChainGameClientRoomView extends JFrame {
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView(/*String username, String ip_addr, String port_no*/) {
+	public WordChainGameClientRoomView() {
+//		this.waitingRoom = waitingRoom;
+//		if (waitingRoom != null) {
+//			ChatMsg obcm = new ChatMsg("", "160", "UserInfo Request");
+//			waitingRoom.SendObject(obcm);
+//		}
 		initialize();
 		
 //		try {
@@ -464,14 +470,12 @@ public class WordChainGameClientRoomView extends JFrame {
 					socket = null;
 					return null;
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 					try {
 						oos.close();
 						socket.close();
 						ois.close();
 					} catch (IOException e2) {
-						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
 

@@ -8,9 +8,9 @@ public class Room implements Serializable {
 	public int roomCount = 0; // 방 인원
 	public int roundTime = 10; // 라운드 시간
 	public int roundCount = 4; // 라운드 수
-	public Vector<String> userVector; // 같은 방에 입장한 유저 정보 저장
+	public String userList = ""; // 같은 방에 입장한 유저 정보 저장
 	
-	public Room() {
-		userVector = new Vector<String>();
+	public void setUserList(String userName) {
+		userList += userName + "@";
 	}
 }

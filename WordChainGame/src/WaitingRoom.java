@@ -40,6 +40,8 @@ public class WaitingRoom extends JFrame {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
+	public WordChainGameClientRoomView view;
+	public WaitingRoom waitingRoom;
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
 	private JScrollPane userScrollPane, roomScrollPane;
@@ -253,19 +255,18 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
-						System.out.println(cm.room.userVector.size());
+						String [] enterGameUsers = cm.data.split("#");
+						System.out.println(cm.data + "\n");
+						// 유저의 창을 닫고 게임방 입장
 //						setVisible(false);
-//						gameView.setVisible(true);
-						for(int i=0;i<cm.room.userVector.size();i++) {
-							System.out.println("들어온 사람 : " + cm.room.userVector.get(i));
-						}
+//						view = new WordChainGameClientRoomView(); // 게임입장
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
-						System.out.println("타이틀 : " + cm.roomTitle);
-						if(cm.roomTitle!=null) {
+						if(cm.roomTitle != null) {
 							String [] title = cm.roomTitle.split(",");	
 							roomList.setListData(title);
 						}
+						
 //						// 추가한 부분
 //						for(int i=0; i < title.length; i++) {
 //							row = new Vector<String>();
@@ -310,14 +311,15 @@ public class WaitingRoom extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String title = JOptionPane.showInputDialog("방제목을 입력하세요"); // 방 제목 입력받는 팝업창
-			
 			ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
 			obcm.roomTitle = title;
 			SendObject(obcm);
+//			
+//			// 방 만든 유저의 창을 닫고 게임방 입장
+//			setVisible(false);
+//			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView(waitingRoom); // 게임입장
 			
-			// 방 만든 유저의 창을 닫고 게임방 입장
-			setVisible(false);
-			WordChainGameClientRoomView gameView = new WordChainGameClientRoomView(); // 게임입장
+			
 //			createRoom = new CreateRoom(createRoomFrame);
 //            createRoomFrame = new JFrame();
 //            createRoomFrame.setTitle("방 생성");

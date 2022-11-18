@@ -182,74 +182,26 @@ public class WordChainGameServer extends JFrame {
 		
 		// 게임 방 입장 알림(수정중......)
 		public void GameRoomEnterAlarm(Room myRoom) {
-			int count = 0;
-//			for (int i = 0; i < user_vc.size() ; i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				user.Test(myRoom);
-//			}
-			Room tmpRoom = null;
-			Vector<String> tmp = new Vector<String>();
+			// 방번호#방제목#들어온 인원수#점수#user1@user2@
+			String tmp = "";
+			tmp += myRoom.roomNumber + "#";
+			tmp += myRoom.roomTitle + "#";
+			tmp += myRoom.roomCount + "#";
+			tmp += UserScore + "#";
+			tmp += myRoom.userList;
+			
+			String [] users = myRoom.userList.split("@");
 			for (int i = 0; i < user_vc.size() ; i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
-				for(int j=0;j<myRoom.userVector.size();j++) {
-					if(myRoom.userVector.get(j)==user.UserName) {
+				for(int j = 0; j < users.length; j++) {
+					if(users[j].equals(user.UserName)) {
 						if (user.UserStatus == "O") {
-							tmp.add(user.UserName);
-							count++;
+							user.GameRoomEnterAlarmOne(tmp);
 						}
 					}
 				}
 			}
-			
-			myRoom.userVector.removeAllElements();
-			myRoom.userVector = tmp;
-			
-//			for (int i = 0; i < user_vc.size() ; i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				for(int j=0;j<myRoom.userVector.size();j++) {
-//					if(myRoom.userVector.get(j)==user.UserName) {
-//						if (user.UserStatus == "O") {
-//							user.Test(myRoom);
-//						}
-//					}
-//				}
-//			}
-			
-			for (int i = 0; i < user_vc.size() ; i++) {
-				UserService user = (UserService) user_vc.elementAt(i);
-				for(int j=0;j<myRoom.userVector.size();j++) {
-					if(myRoom.userVector.get(j)==user.UserName) {
-						if (user.UserStatus == "O")
-							user.Test(myRoom);
-					}
-				}
-			}
-			
-//			for(int i=0;i<myRoom.userVec;i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				//myRoom.userVector.add(user.UserName);
-//				System.out.println("@@@@@@@" + user.UserName);
-//				if (user.UserStatus == "O")
-//					user.Test(myRoom);
-//			}
-//			try {
-//				ChatMsg ob = new ChatMsg(UserName, "302", title);
-//				ob.SetRoomTitle(title);
-//				oos.writeObject(ob);
-//			} catch (IOException e) {
-//				AppendText("dos.writeObject() error");
-//				try {
-//					ois.close();
-//					oos.close();
-//					client_socket.close();
-//					client_socket = null;
-//					ois = null;
-//					oos = null;
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-//				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
-//			}
+
 		}
 		
 		// 방 만드는 방송
@@ -342,10 +294,9 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		
-		public void Test(Room room) {
+		public void GameRoomEnterAlarmOne(String msg) {
 			try {
-				ChatMsg r_ob = new ChatMsg(UserName, "301", "room enter");
-				r_ob.SetTest(room);
+				ChatMsg r_ob = new ChatMsg(UserName, "301", msg);
 				oos.writeObject(r_ob);
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
@@ -513,6 +464,9 @@ public class WordChainGameServer extends JFrame {
 							UserStatus = "O";
 							WriteAllObject(cm);
 						}
+					} else if(cm.code.matches("160")) { // 사람 들어올 때 마다 방 정보 요청
+//						System.out.println(cm.UserName + ",");
+						break;
 					} else if(cm.code.matches("301")) { // 방 입장
 						for(int i = 0; i < RoomVec.size(); i++) {
 							Room room = RoomVec.get(i);
@@ -520,31 +474,29 @@ public class WordChainGameServer extends JFrame {
 								System.out.println(UserName + "이 입장");
 								myRoom = room;  // 들어간 방 설정
 								myRoom.roomCount++; // 인원수 증가
-								System.out.println("이 방에 총 " + myRoom.roomCount + "명 들어와 있음");
+								myRoom.setUserList(UserName); // 게임방에 접속한 유저를 추가
+								System.out.println("이 방에 총 " + myRoom.roomCount + "명 들어와 있음, 총 들어잇는 사람" + myRoom.userList);
 								break;
 							}
 						}
 						
 						// 유저를 게임방으로 이동시키기
 						WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기
-						myRoom.userVector.add(UserName); // 게임방에 접속한 유저를 벡터에 추가
 						GameRoomEnterAlarm(myRoom);
 						
 					} else if(cm.code.matches("302")) { // 방 만들기 처리
 						myRoom = new Room(); // 새로운 방 생성
-						myRoom.roomTitle = cm.roomTitle; // 방 제목 저장
 						myRoom.roomNumber = totalRoomCount++; // 1번 방
-						myRoom.roomCount += 1; // 방 인원 수 증가
+						myRoom.roomTitle = cm.roomTitle; // 방 제목 저장
 						myRoom.roomManager = UserName; // 방장 설정
+						myRoom.roomCount += 1; // 방 인원 수 증가
+						myRoom.setUserList(UserName); // 게임방에 접속한 유저를 추가(방마다 유저가 몇명있는지 관리)
 						
 						RoomVec.add(myRoom); // 현재 만든 방을 모든방리스트 벡터에 추가
 						WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기
-						myRoom.userVector.add(UserName); // 게임방에 접속한 유저를 벡터에 추가(방마다 유저가 몇명있는지 관리하는 벡터)
-//						if(room.userVector.get(0) == UserName) {
-//							System.out.println("찾았습니다" + UserScore + "$$" + UserName);
-//						}
 						EnterAlarmAll();
 						CreateRoomAlarmAll(); // 대기실에 있는 유저들에게 방정보 출력
+						GameRoomEnterAlarm(myRoom);
 						break;
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
