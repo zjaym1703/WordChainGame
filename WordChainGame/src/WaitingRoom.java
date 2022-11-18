@@ -2,7 +2,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -15,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,12 +33,12 @@ import javax.swing.ListSelectionModel;
 public class WaitingRoom extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
-	private String UserName;
+	public String UserName;
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
-	public WordChainGameClientRoomView view;
+	public WordChainGameClientRoomView gameRoomView;
 	public WaitingRoom waitingRoom;
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
@@ -66,6 +64,7 @@ public class WaitingRoom extends JFrame {
 	
 	public WaitingRoom(String userName, String ip_addr, String port_no)  {
 		this.UserName = userName;
+		this.waitingRoom = this;
 		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -250,9 +249,11 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
+					//	String [] enterGameUsers = cm.data.split("#");
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
-						view = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
+						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
+						gameRoomView.addUser((String)cm.data);
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
@@ -269,11 +270,16 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "307": // 사용자 입장 알림 받음
-						// 유저에게 메시지 전달 
-//						view.Test(cm);
+						gameRoomView.addUser((String)cm.data);
 						break;
-					case "401": // 유저 퇴장
+					case "200":
+						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
 						
+						if(cm.UserName.equals(UserName)) {
+							gameRoomView.AppendTextColor(msg,Color.RED);
+						}else {
+							gameRoomView.AppendText(msg);
+						}
 						break;
 					}
 				} catch (IOException e) {
@@ -291,6 +297,31 @@ public class WaitingRoom extends JFrame {
 		}
 	}
 	
+	public void SendChatMsg(ChatMsg obj) {
+		System.out.println(obj.UserName+" : "+obj.data);
+		try {
+			oos.writeObject(obj);
+			if (obj.code.equals("300")) { 
+				//oos.writeObject(obj.imgbytes);
+			}
+			oos.flush();
+		} catch (IOException e) {
+			//AppendText("SendChatMsg Error");
+			e.printStackTrace();
+			try {
+				oos.close();
+				socket.close();
+				ois.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// textArea.append("�޼��� �۽� ����!!\n");
+			// System.exit(0);
+		}
+	}
+
 	class RoomCreateAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {

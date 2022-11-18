@@ -10,8 +10,8 @@ import java.awt.Font;
 
 class UserPanel extends JPanel{
 
-	private final int width = 120;
-	private final int height = 165;
+	public final int width = 120;
+	public final int height = 165;
 	
 	//상태정보
 	private String name;

@@ -162,10 +162,10 @@ public class WordChainGameServer extends JFrame {
 
 		public void Login() {
 			AppendText("새로운 참가자 " + UserName + " 입장.");
-			WriteOne("Welcome to Java chat server\n");
-			WriteOne(UserName + "님 환영합니다.\n"); // 연결된 사용자에게 정상접속을 알림
+			//WriteOne("Welcome to Java chat server\n"); //채팅메시지가 200이여서 주석처리함 
+			//WriteOne(UserName + "님 환영합니다.\n"); // 연결된 사용자에게 정상접속을 알림
 			String msg = "[" + UserName + "]님이 입장 하였습니다.\n";
-			WriteOthers(msg); // 아직 user_vc에 새로 입장한 user는 포함되지 않았다.
+			//WriteOthers(msg); // 아직 user_vc에 새로 입장한 user는 포함되지 않았다.
 
 			EnterAlarmAll(); // 새로 접속한 유저 리스트 알림
 			CreateRoomAlarmAll();
@@ -175,7 +175,7 @@ public class WordChainGameServer extends JFrame {
 			String msg = "[" + UserName + "]님이 퇴장 하였습니다.\n";
 			UserVec.removeElement(this); // Logout한 현재 객체를 벡터에서 지운다
 			WaitUserVec.remove(UserName);
-			WriteAll(msg); // 나를 제외한 다른 User들에게 전송
+			//WriteAll(msg); // 나를 제외한 다른 User들에게 전송
 			AppendText("사용자 " + "[" + UserName + "] 퇴장. 현재 참가자 수 " + UserVec.size());
 			EnterAlarmAll();
 		}
@@ -198,9 +198,12 @@ public class WordChainGameServer extends JFrame {
 					if(user.UserName.equals(users[users.length - 1])) {
 						System.out.println("user : " + users[users.length - 1]);
 						user.GameRoomEnterAlarmOne("create", tmp);
+						WriteOne(UserName + "님 환영합니다.\n");
 						break;
 					} else if(user.UserName.equals(users[j])){
 						user.GameRoomEnterAlarmOne("noti", tmp);
+						//String msg = "[" + UserName + "]님이 입장 하였습니다.\n";
+						//WriteOthers(msg);
 						break;
 					}
 				}
@@ -304,7 +307,6 @@ public class WordChainGameServer extends JFrame {
 					ChatMsg r_ob = new ChatMsg(UserName, "301", msg);
 					oos.writeObject(r_ob);
 				} else {
-					System.out.println("307메시지 : " + msg);
 					ChatMsg r_ob = new ChatMsg(UserName, "307", msg);
 					oos.writeObject(r_ob);
 				}
