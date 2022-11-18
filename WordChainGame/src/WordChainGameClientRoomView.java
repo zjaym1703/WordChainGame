@@ -90,12 +90,14 @@ public class WordChainGameClientRoomView extends JFrame {
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView() {
+	public WordChainGameClientRoomView(){
 //		this.waitingRoom = waitingRoom;
 //		if (waitingRoom != null) {
 //			ChatMsg obcm = new ChatMsg("", "160", "UserInfo Request");
 //			waitingRoom.SendObject(obcm);
 //		}
+		
+		System.out.println();
 		initialize();
 		
 //		try {

@@ -258,8 +258,8 @@ public class WaitingRoom extends JFrame {
 						String [] enterGameUsers = cm.data.split("#");
 						System.out.println(cm.data + "\n");
 						// 유저의 창을 닫고 게임방 입장
-//						setVisible(false);
-//						view = new WordChainGameClientRoomView(); // 게임입장
+						setVisible(false);
+						view = new WordChainGameClientRoomView(); // 게임입장
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
@@ -275,22 +275,10 @@ public class WaitingRoom extends JFrame {
 //						model.addRow(row);
 //						//
 						break;
-//					case "200": // chat message
-//						if (cm.UserName.equals(UserName))
-//							AppendTextR(msg); // 내 메세지는 우측에
-//						else
-//							AppendText(msg);
-//						break;
-//					case "300": // Image 첨부
-//						if (cm.UserName.equals(UserName))
-//							AppendTextR("[" + cm.UserName + "]");
-//						else
-//							AppendText("[" + cm.UserName + "]");
-//						AppendImage(cm.img);
-//						break;
-//					case "500": // Mouse Event 수신
-//						DoMouseEvent(cm);
-//						break;
+					case "307": // 사용자 입장 알림 받음
+						System.out.println("307 response : "+cm.data + "\n");
+						// 유저에게 메시지 전달 
+						break;
 					}
 				} catch (IOException e) {
 //					AppendText("ois.readObject() error");
