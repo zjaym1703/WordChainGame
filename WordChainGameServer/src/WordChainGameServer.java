@@ -507,12 +507,12 @@ public class WordChainGameServer extends JFrame {
 						EnterAlarmAll();
 						CreateRoomAlarmAll(); // 대기실에 있는 유저들에게 방정보 출력
 						GameRoomEnterAlarm(myRoom);
-						break;
+						
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
 					} else if (cm.code.matches("401")) { // 퇴장 처리
-						
+						System.out.println("hi");
 					}
 					else { // 300, 500, ... 기타 object는 모두 방송한다.
 						WriteAllObject(cm);

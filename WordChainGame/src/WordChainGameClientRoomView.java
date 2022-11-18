@@ -376,6 +376,9 @@ public class WordChainGameClientRoomView extends JFrame {
 //		user.setScore(1000);
 //		UserListPanel.add(user);
 
+		RoomExitCreateAction roomExitCreateAction = new RoomExitCreateAction();
+		exitButton.addActionListener(roomExitCreateAction);
+		
 		revalidate();
 		repaint();
 	}
@@ -387,7 +390,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			int roomNum = Integer.parseInt(roomNumber); // int형으로 바꿈
 			ChatMsg obcm = new ChatMsg(UserName, "401", "Exit Room");
 			obcm.SetRoomNumber(roomNum);
-//			waitingRoom.SendObject(obcm);
+			waitingRoom.SendObject(obcm);
 		}
 	}
 
