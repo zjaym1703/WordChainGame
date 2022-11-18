@@ -40,7 +40,7 @@ public class WaitingRoom extends JFrame {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	
-	public WordChainGameClientRoomView view;
+	public WordChainGameClientRoomView gameRoomView;
 	public WaitingRoom waitingRoom;
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
@@ -255,11 +255,11 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
-						String [] enterGameUsers = cm.data.split("#");
-						System.out.println(cm.data + "\n");
+					//	String [] enterGameUsers = cm.data.split("#");
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
-						view = new WordChainGameClientRoomView(); // 게임입장
+						gameRoomView = new WordChainGameClientRoomView(waitingRoom,cm.data); // 게임입장
+						gameRoomView.addUser((String)cm.data);
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
@@ -276,8 +276,7 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "307": // 사용자 입장 알림 받음
-						System.out.println("307 response : "+cm.data + "\n");
-						// 유저에게 메시지 전달 
+						gameRoomView.addUser((String)cm.data);
 						break;
 					}
 				} catch (IOException e) {
@@ -294,7 +293,7 @@ public class WaitingRoom extends JFrame {
 			}
 		}
 	}
-	
+
 	class RoomCreateAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {

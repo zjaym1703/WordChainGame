@@ -48,6 +48,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	private ObjectOutputStream oos;
 	
 	private WaitingRoom waitingRoom;
+	private String data;
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
@@ -90,8 +91,10 @@ public class WordChainGameClientRoomView extends JFrame {
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView(){
-//		this.waitingRoom = waitingRoom;
+	public WordChainGameClientRoomView(WaitingRoom waitingRoom ,String data){
+		this.waitingRoom = waitingRoom;
+		this.data = data;
+		System.out.println("wordChain"+data);
 //		if (waitingRoom != null) {
 //			ChatMsg obcm = new ChatMsg("", "160", "UserInfo Request");
 //			waitingRoom.SendObject(obcm);
@@ -359,18 +362,20 @@ public class WordChainGameClientRoomView extends JFrame {
 
 		contentPanel.add(gameStartBtn);
 		
-		//사용자리스트 
+//		//사용자리스트 
 		UserListPanel = new JPanel();
 		UserListPanel.setBounds(31, 229, 645, 165);
 		UserListPanel.setLayout(null);
 		UserListPanel.setBackground(new Color(0,0,0,0));
-		
-		UserPanel user = new UserPanel(userPanelX,userPanelY);
-		user.setName("끄투");
-		user.setScore(1000);
-		UserListPanel.add(user);
-		
+//		
+//		UserPanel user = new UserPanel(userPanelX,userPanelY);
+//		user.setName("끄투");
+//		user.setScore(1000);
+//		UserListPanel.add(user);
+//		
 		contentPanel.add(UserListPanel);
+		revalidate();
+		repaint();
 	}
 
 	ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
@@ -380,17 +385,40 @@ public class WordChainGameClientRoomView extends JFrame {
 		return xyimg;
 	}
 	
+	public void addUser(String list) {
+		String data[] = list.split("#");
+		String userList[] = data[data.length-1].split("@");
+		
+		Vector<UserDTO> user = new Vector<UserDTO>();
+		//받아온 문자열
+		//1#hi#2#0#user1@user2@
+		if(data!=null) {
+			for(int i=0;i<userList.length;i++) { 
+				UserDTO u = new UserDTO(userList[i],0,"O");	
+				user.add(u);
+			}
+			addUserPanel(user);
+		}
+	}
+	
 	public void addUserPanel(Vector<UserDTO> list) {
+		UserListPanel.removeAll();
+		int userPanelX = 0;
+		int userPanelY = 0;
+		
 		for(int i=0;i<list.size();i++) {
 			UserPanel user = new UserPanel(userPanelX,userPanelY);
 			user.setName(list.get(i).getName());
 			user.setScore(list.get(i).getScore());
+			System.out.println("user : "+user.getName()+" width :"+userPanelX);
 			UserListPanel.add(user);
 			
-			userPanelX += user.WIDTH + 5;
-			userPanelX += user.HEIGHT;
+			userPanelX += user.width + 5;
 		}
+		contentPanel.revalidate();
+		contentPanel.repaint();
 	}
+	
 	public void SendChatMsg(ChatMsg obj) {
 		try {
 			oos.writeObject(obj.code);
@@ -416,8 +444,6 @@ public class WordChainGameClientRoomView extends JFrame {
 			// System.exit(0);
 		}
 	}
-	
-	
 	
 	class ListenNetwork extends Thread {
 		public void run() {
