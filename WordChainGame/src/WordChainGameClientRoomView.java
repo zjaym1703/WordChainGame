@@ -226,8 +226,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		scoreLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
 		scoreLabel.setForeground(new Color(251, 255, 250));
 		scoreLabel.setBounds(6, 15, 58, 49);
-		Thread threadNum = new Thread(scoreLabel);
-		threadNum.start();
+
 		timerPanel.add(scoreLabel);
 		contentPanel.add(timerPanel);
 		
@@ -371,10 +370,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		
 		contentPanel.add(UserListPanel);
 		
-//		UserPanel user = new UserPanel(userPanelX,userPanelY);
-//		user.setName("끄투");
-//		user.setScore(1000);
-//		UserListPanel.add(user);
 
 		RoomExitCreateAction roomExitCreateAction = new RoomExitCreateAction();
 		exitButton.addActionListener(roomExitCreateAction);
@@ -438,12 +433,13 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	// 화면에 출력
 	public void AppendText(String msg) {
-		// textArea.append(msg + "\n");
-		// AppendIcon(icon1);
 		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
 		int len = textArea.getDocument().getLength();
 		// 끝으로 이동
 		textArea.setCaretPosition(len);
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.black);
+		textArea.setCharacterAttributes(aset,false);
 		textArea.replaceSelection(msg + "\n");
 	}
 		
