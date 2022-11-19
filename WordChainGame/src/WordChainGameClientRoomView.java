@@ -418,6 +418,11 @@ public class WordChainGameClientRoomView extends JFrame {
 		
 	}
 	
+	public void exitUser(String list) {
+		String data[] = list.split("#");
+		
+	}
+	
 	public void addUserPanel(Vector<UserDTO> list) {
 		UserListPanel.removeAll();
 		int userPanelX = 0;

@@ -180,7 +180,7 @@ public class WordChainGameServer extends JFrame {
 			EnterAlarmAll();
 		}
 		
-		// 게임 방 입장 알림(수정중......)
+		// 게임 방 입장 알림
 		public void GameRoomEnterAlarm(Room myRoom) {
 			// 방번호#방제목#들어온 인원수#점수#user1@user2@
 			String tmp = "";
@@ -210,6 +210,22 @@ public class WordChainGameServer extends JFrame {
 			}
 			
 		}
+		
+//		// 방 나갈 때
+//		public void RoomExit(ChatMsg cm) {
+//			for(int i = 0; i < RoomVec.size(); i++) {
+//				Room room = RoomVec.get(i);
+//				if(cm.roomNumber == room.roomNumber) {
+//					String [] userList = room.userList.split("@");
+//					for (int j = 0; j < user_vc.size(); j++) {
+//						UserService user = (UserService) user_vc.elementAt(j);
+//						if (cm.UserName.equals(userList[j]) && userList[j].equals(user.UserName)) {
+//							user.GameExitAlarmOne(UserName);
+//						}
+//					}
+//				}
+//			}
+//		}
 		
 		// 방 만드는 방송
 		public void CreateRoomAlarmAll() {
@@ -311,6 +327,26 @@ public class WordChainGameServer extends JFrame {
 					oos.writeObject(r_ob);
 				}
 				
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					ois.close();
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
+		}
+		
+		public void GameExitAlarmOne(String userName) {
+			try {
+				ChatMsg r_ob = new ChatMsg(userName, "401", "Exit : " + userName);
+				oos.writeObject(r_ob);
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
 				try {
@@ -512,7 +548,7 @@ public class WordChainGameServer extends JFrame {
 						Logout();
 						break;
 					} else if (cm.code.matches("401")) { // 퇴장 처리
-						System.out.println("hi");
+						RoomExit(cm);
 					}
 					else { // 300, 500, ... 기타 object는 모두 방송한다.
 						WriteAllObject(cm);
