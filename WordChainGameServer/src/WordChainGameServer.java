@@ -209,6 +209,7 @@ public class WordChainGameServer extends JFrame {
 						WriteOne(UserName + "님 환영합니다.\n");
 						break;
 					} else if(user.UserName.equals(users[j])){
+						EnterAlarmAll();
 						user.GameRoomEnterAlarmOne("noti", tmp);
 						//String msg = "[" + UserName + "]님이 입장 하였습니다.\n";
 						//WriteOthers(msg);
