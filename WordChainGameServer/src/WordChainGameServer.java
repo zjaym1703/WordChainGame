@@ -9,10 +9,6 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -224,14 +220,16 @@ public class WordChainGameServer extends JFrame {
 		public void RoomExit(Room myRoom, String deleteUser) {
 			// 방번호#방제목#들어온 인원수#점수#user1@user2@
 			String tmp = RoomInfo(myRoom);
-			String userlist = tmp.split("#")[4];
-			String [] users = userlist.split("@");
-			
-			for(int i = 0; i < user_vc.size(); i++) {
-				UserService user = (UserService) user_vc.elementAt(i);
-				for(int j = 0; j < users.length; j++) {
-					if(user.UserName.equals(users[j])) {
-						user.GameRoomExitAlarmOne(userlist, deleteUser);
+			if(myRoom.userList.contains("@")) {
+				String userlist = tmp.split("#")[4];
+				String [] users = userlist.split("@");
+				
+				for(int i = 0; i < user_vc.size(); i++) {
+					UserService user = (UserService) user_vc.elementAt(i);
+					for(int j = 0; j < users.length; j++) {
+						if(user.UserName.equals(users[j])) {
+							user.GameRoomExitAlarmOne(userlist, deleteUser);
+						}
 					}
 				}
 			}
@@ -308,7 +306,8 @@ public class WordChainGameServer extends JFrame {
 		
 		public void GameRoomExitAlarmOne(String userlist, String deleteUser) {
 			try {
-				ChatMsg r_ob = new ChatMsg(deleteUser, "401", userlist);
+				ChatMsg r_ob = new ChatMsg(UserName, "401", userlist);
+				r_ob.SetDeleteUser(deleteUser);
 				oos.writeObject(r_ob);
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
@@ -583,28 +582,19 @@ public class WordChainGameServer extends JFrame {
 						Logout();
 						break;
 					} else if (cm.code.matches("401")) { // 유저 퇴장 처리
-						for(int i = 0; i < RoomVec.size(); i++) {
+						for(int i=0;i<RoomVec.size();i++) {
 							Room room = RoomVec.get(i);
 							if(cm.roomNumber == room.roomNumber) {
 								String [] userList = room.userList.split("@");
 								for (int j = 0; j < userList.length; j++) {
-									if (cm.UserName.equals(userList[j])) {
-										room.roomCount--; // 방의 인원수 한명 줄임
-										if (room.roomCount != 0) { // 방에 1명 이상 남아 있을 때
-											room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
-//											WaitUserVec.add(cm.UserName); // 대기실에 해당 유저 추가
-											RoomExit(room, cm.UserName);
-											EnterAlarmAll();
-											break;
-										}
-										else { // 방에 아무도 없을 때 방 삭제
-											RoomVec.remove(room);
-											WaitUserVec.add(cm.UserName);
-											EnterAlarmAll();
-											CreateRoomAlarmAll();
-											break;
-										}
+									room.roomCount--; // 방의 인원수 한명 줄임
+									room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
+									RoomExit(room, cm.UserName);
+									if (room.roomCount == 0) {
+										RoomVec.remove(room);
+										totalRoomCount = 0;
 									}
+									break;
 								}
 							}
 						}

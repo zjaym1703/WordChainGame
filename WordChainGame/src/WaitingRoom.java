@@ -205,6 +205,12 @@ public class WaitingRoom extends JFrame {
 		}
 	}
 	
+	public void VisibleWaitingRoom()  {
+		setVisible(true);
+		revalidate();
+		repaint();
+	}
+	
 	// Server Message를 수신해서 화면에 표시
 	class ListenNetwork extends Thread {
 		public void run() {
@@ -281,7 +287,10 @@ public class WaitingRoom extends JFrame {
 						}
 						break;
 					case "401":
-						gameRoomView.deleteUser(cm.UserName, cm.data);
+						String [] roomRemainUsers = cm.data.split("@");
+						for(int i=0;i<roomRemainUsers.length;i++) {
+							gameRoomView.deleteUser(cm.deleteUser, cm.data);
+						}
 						break;
 					}
 				} catch (IOException e) {

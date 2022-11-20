@@ -390,6 +390,10 @@ public class WordChainGameClientRoomView extends JFrame {
 			ChatMsg obcm = new ChatMsg(UserName, "401", "Exit Room");
 			obcm.SetRoomNumber(roomNum);
 			waitingRoom.SendObject(obcm);
+			setVisible(false);
+			ChatMsg obcm2 = new ChatMsg(UserName, "100", "Waiting room go");
+			waitingRoom.SendObject(obcm2);
+			waitingRoom.VisibleWaitingRoom();
 		}
 	}
 
@@ -412,7 +416,6 @@ public class WordChainGameClientRoomView extends JFrame {
 				}
 			}
 			addUserPanel(user);
-			waitingRoom = new WaitingRoom(deleteUser, "127.0.0.1", "30000"); // 게임입장
 		}
 	}
 	
@@ -442,7 +445,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			UserPanel user = new UserPanel(userPanelX,userPanelY);
 			user.setName(list.get(i).getName());
 			user.setScore(list.get(i).getScore());
-			System.out.println("user : "+user.getName()+" width :"+userPanelX);
+//			System.out.println("user : "+user.getName()+" width :"+userPanelX);
 			UserListPanel.add(user);
 			
 			userPanelX += user.width + 5;

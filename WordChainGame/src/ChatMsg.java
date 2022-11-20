@@ -14,6 +14,7 @@ class ChatMsg implements Serializable {
 //	public int pen_size; // pen size
 	public String roomTitle; // 방 이름
 	public int roomNumber; // 방 번호
+	public String deleteUser;
 
 	public ChatMsg(String UserName, String code, String msg) {
 		this.code = code;
@@ -29,10 +30,7 @@ class ChatMsg implements Serializable {
 		this.roomNumber = roomNumber;
 	}
 	
-//	public void SetTest(Room room) {
-//		this.room = room;
-//		for(int i=0; i < this.room.userVector.size(); i++) {
-//			System.out.println("Client ChatMsg : " + this.room.userVector.get(i));
-//		}
-//	}
+	public void SetDeleteUser(String deleteUser) {
+		this.deleteUser = deleteUser;
+	}
 }
