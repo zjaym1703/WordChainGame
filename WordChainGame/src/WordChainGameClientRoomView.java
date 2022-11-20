@@ -412,7 +412,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				}
 			}
 			addUserPanel(user);
-//			waitingRoom = new WaitingRoom(deleteUser, "127.0.0.1", "30000"); // 게임입장
+			waitingRoom = new WaitingRoom(deleteUser, "127.0.0.1", "30000"); // 게임입장
 		}
 	}
 	

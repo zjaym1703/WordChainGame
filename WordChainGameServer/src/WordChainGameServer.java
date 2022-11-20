@@ -590,11 +590,20 @@ public class WordChainGameServer extends JFrame {
 								for (int j = 0; j < userList.length; j++) {
 									if (cm.UserName.equals(userList[j])) {
 										room.roomCount--; // 방의 인원수 한명 줄임
-										room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
-										WaitUserVec.add(cm.UserName); // 대기실에 해당 유저 추가
-										RoomExit(room, cm.UserName);
-										EnterAlarmAll();
-										break;
+										if (room.roomCount != 0) { // 방에 1명 이상 남아 있을 때
+											room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
+//											WaitUserVec.add(cm.UserName); // 대기실에 해당 유저 추가
+											RoomExit(room, cm.UserName);
+											EnterAlarmAll();
+											break;
+										}
+										else { // 방에 아무도 없을 때 방 삭제
+											RoomVec.remove(room);
+											WaitUserVec.add(cm.UserName);
+											EnterAlarmAll();
+											CreateRoomAlarmAll();
+											break;
+										}
 									}
 								}
 							}
