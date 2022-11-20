@@ -1,6 +1,8 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -180,23 +183,28 @@ public class WordChainGameServer extends JFrame {
 			EnterAlarmAll();
 		}
 		
-		// 게임 방 입장 알림
-		public void GameRoomEnterAlarm(Room myRoom) {
-			// 방번호#방제목#들어온 인원수#점수#user1@user2@
+		public String RoomInfo(Room myRoom) {
 			String tmp = "";
 			tmp += myRoom.roomNumber + "#";
 			tmp += myRoom.roomTitle + "#";
 			tmp += myRoom.roomCount + "#";
 			tmp += UserScore + "#";
 			tmp += myRoom.userList;
-			
+			return tmp;
+		}
+		
+		// 게임 방 입장 알림
+		public void GameRoomEnterAlarm(Room myRoom) {
+			// 방번호#방제목#들어온 인원수#점수#user1@user2@
+			String tmp = RoomInfo(myRoom);
 			String [] users = myRoom.userList.split("@");
+			
 			//room.userList에 마지막인자 == 최근입장한 사람 -> 301 호
 			for(int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i); // 가장 최근에 들어온 사람
 				for(int j = 0; j < users.length; j++) {
 					if(user.UserName.equals(users[users.length - 1])) {
-						System.out.println("user : " + users[users.length - 1]);
+//						System.out.println("user : " + users[users.length - 1]);
 						user.GameRoomEnterAlarmOne("create", tmp);
 						WriteOne(UserName + "님 환영합니다.\n");
 						break;
@@ -211,21 +219,22 @@ public class WordChainGameServer extends JFrame {
 			
 		}
 		
-//		// 방 나갈 때
-//		public void RoomExit(ChatMsg cm) {
-//			for(int i = 0; i < RoomVec.size(); i++) {
-//				Room room = RoomVec.get(i);
-//				if(cm.roomNumber == room.roomNumber) {
-//					String [] userList = room.userList.split("@");
-//					for (int j = 0; j < user_vc.size(); j++) {
-//						UserService user = (UserService) user_vc.elementAt(j);
-//						if (cm.UserName.equals(userList[j]) && userList[j].equals(user.UserName)) {
-//							user.GameExitAlarmOne(UserName);
-//						}
-//					}
-//				}
-//			}
-//		}
+		// 일반유저가 방을 나갈때 방안에 있는 유저들에게 방송
+		public void RoomExit(Room myRoom, String deleteUser) {
+			// 방번호#방제목#들어온 인원수#점수#user1@user2@
+			String tmp = RoomInfo(myRoom);
+			String userlist = tmp.split("#")[4];
+			String [] users = userlist.split("@");
+			
+			for(int i = 0; i < user_vc.size(); i++) {
+				UserService user = (UserService) user_vc.elementAt(i);
+				for(int j = 0; j < users.length; j++) {
+					if(user.UserName.equals(users[j])) {
+						user.GameRoomExitAlarmOne(userlist, deleteUser);
+					}
+				}
+			}
+		}
 		
 		// 방 만드는 방송
 		public void CreateRoomAlarmAll() {
@@ -296,6 +305,26 @@ public class WordChainGameServer extends JFrame {
 			return packet;
 		}
 		
+		public void GameRoomExitAlarmOne(String userlist, String deleteUser) {
+			try {
+				ChatMsg r_ob = new ChatMsg(deleteUser, "401", userlist);
+				oos.writeObject(r_ob);
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					ois.close();
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
+		}
+		
 		public void CreateRoomAlarmOne(String title) {
 			try {
 				ChatMsg r_ob = new ChatMsg(UserName, "302", title);
@@ -322,7 +351,7 @@ public class WordChainGameServer extends JFrame {
 				if(type.equals("create")) {
 					ChatMsg r_ob = new ChatMsg(UserName, "301", msg);
 					oos.writeObject(r_ob);
-				} else {
+				} else if (type.equals("noti")){
 					ChatMsg r_ob = new ChatMsg(UserName, "307", msg);
 					oos.writeObject(r_ob);
 				}
@@ -343,10 +372,15 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		
-		public void GameExitAlarmOne(String userName) {
+		public void GameExitAlarmOne(String type, String userName) {
 			try {
-				ChatMsg r_ob = new ChatMsg(userName, "401", "Exit : " + userName);
-				oos.writeObject(r_ob);
+				if(type.equals("One Exit")) {
+					ChatMsg r_ob = new ChatMsg(UserName, "401", userName);
+					oos.writeObject(r_ob);
+				} else {
+					ChatMsg r_ob = new ChatMsg(UserName, "402", userName);
+					oos.writeObject(r_ob);
+				}
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
 				try {
@@ -547,8 +581,24 @@ public class WordChainGameServer extends JFrame {
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
-					} else if (cm.code.matches("401")) { // 퇴장 처리
-						RoomExit(cm);
+					} else if (cm.code.matches("401")) { // 유저 퇴장 처리
+						for(int i = 0; i < RoomVec.size(); i++) {
+							Room room = RoomVec.get(i);
+							if(cm.roomNumber == room.roomNumber) {
+								String [] userList = room.userList.split("@");
+								for (int j = 0; j < userList.length; j++) {
+									if (cm.UserName.equals(userList[j])) {
+										room.roomCount--; // 방의 인원수 한명 줄임
+										room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
+										WaitUserVec.add(cm.UserName); // 대기실에 해당 유저 추가
+										RoomExit(room, cm.UserName);
+										EnterAlarmAll();
+										break;
+									}
+								}
+							}
+						}
+						
 					}
 					else { // 300, 500, ... 기타 object는 모두 방송한다.
 						WriteAllObject(cm);
@@ -569,4 +619,27 @@ public class WordChainGameServer extends JFrame {
 		} // run
 	}
 
+	// wordList.txt 파일을 읽고 벡터에 저장하고 벡터로부터 랜덤하게 단어를 추출하는 클래스
+	class Words {
+		private Vector<String> wordVector = new Vector<String>(20000);
+
+		public Words(String fileName) {
+			try {
+				Scanner scanner = new Scanner(new FileReader(fileName));
+				while (scanner.hasNext()) { // 파일 끝까지 읽음
+					String words = scanner.nextLine();
+					wordVector.add(words.trim());
+				}
+			} catch (FileNotFoundException e) {
+				System.out.println("file is not found");
+				System.exit(0);
+			}
+		}
+
+		public String getRandomWord() {
+			int index = (int) (Math.random() * wordVector.size());
+			return wordVector.get(index);
+		}
+
+	}
 }

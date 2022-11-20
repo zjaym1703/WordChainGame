@@ -249,7 +249,6 @@ public class WaitingRoom extends JFrame {
 //						//
 						break;
 					case "301": // 방 입장하는 부분
-					//	String [] enterGameUsers = cm.data.split("#");
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
 						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
@@ -280,6 +279,9 @@ public class WaitingRoom extends JFrame {
 						}else {
 							gameRoomView.AppendText(msg);
 						}
+						break;
+					case "401":
+						gameRoomView.deleteUser(cm.UserName, cm.data);
 						break;
 					}
 				} catch (IOException e) {

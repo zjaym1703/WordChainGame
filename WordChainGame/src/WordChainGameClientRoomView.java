@@ -38,6 +38,9 @@ public class WordChainGameClientRoomView extends JFrame {
 	private int roomNumber = 1; // 방 번호
 	private String roomName = ""; // 방 이름
 	private int roomCount = 0; // 들어온 방 인원
+	private int userScore;
+	private Vector<UserDTO> user;
+	private UserDTO u;
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
@@ -74,12 +77,13 @@ public class WordChainGameClientRoomView extends JFrame {
 	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName){
 		this.waitingRoom = waitingRoom;
 		this.data = data;
-		System.out.print("waiting : " + waitingRoom.UserName);
+		System.out.print("waiting : " + waitingRoom.UserName + " ");
 		//1#hi#2#0#user1@user2@
 		String d[] = data.split("#");
 		this.roomNumber = Integer.parseInt(d[0]);
 		this.roomName = d[1];
 		this.roomCount = Integer.parseInt(d[2]);
+		this.userScore = Integer.parseInt(d[3]);
 		
 		this.UserName = userName;
 		initialize();
@@ -396,25 +400,36 @@ public class WordChainGameClientRoomView extends JFrame {
 		return xyimg;
 	}
 	
+	// 방에서 퇴장한 유저 삭제하는 함수
+	public void deleteUser(String deleteUser, String list) {
+		String userList[] = list.split("@"); // 나가고 남은 사람들 리스트
+
+		if (userList != null) {
+			for(int i=0; i<user.size(); i++) {
+				UserDTO userInfo = user.get(i);
+				if(userInfo.getName().equals(deleteUser)) {
+					user.remove(userInfo);
+				}
+			}
+			addUserPanel(user);
+//			waitingRoom = new WaitingRoom(deleteUser, "127.0.0.1", "30000"); // 게임입장
+		}
+	}
+	
 	public void addUser(String list) {
 		String data[] = list.split("#");
 		String userList[] = data[data.length-1].split("@");
 		
-		Vector<UserDTO> user = new Vector<UserDTO>();
+		user = new Vector<UserDTO>();
 		//받아온 문자열
 		//1#hi#2#0#user1@user2@
 		if(data != null) {
-			for(int i=0;i<userList.length;i++) { 
-				UserDTO u = new UserDTO(userList[i], 0, "O");	
+			for(int i=0; i<userList.length; i++) {
+				u = new UserDTO(userList[i], userScore, "O");
 				user.add(u);
 			}
 			addUserPanel(user);
 		}
-		
-	}
-	
-	public void exitUser(String list) {
-		String data[] = list.split("#");
 		
 	}
 	
