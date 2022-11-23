@@ -270,6 +270,7 @@ public class WaitingRoom extends JFrame {
 						setVisible(false);
 						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
 						gameRoomView.addUser((String)cm.data);
+//						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
@@ -288,7 +289,7 @@ public class WaitingRoom extends JFrame {
 					case "307": // 사용자 입장 알림 받음
 						gameRoomView.addUser((String)cm.data);
 						break;
-					case "308": // 입장 불가 알림
+					case "308": // 입장 가능 여부
 						if (cm.data.equals("Full"))
 							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다");
 						else if (cm.data.equals("Started"))

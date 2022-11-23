@@ -3,7 +3,7 @@ import java.io.Serializable;
 
 class ChatMsg implements Serializable {
 	private static final long serialVersionUID = 1L;
-	// 100:게임입장, 400:로그아웃, 401:게임 퇴장 200:채팅메시지, 301: 방입장, 302:방생성, 307: 사용자 리스트 뿌리기, 308:입장 불가(최대인원 다 참) , 500: Mouse Event
+	// 100:게임입장, 400:로그아웃, 401:게임 퇴장 200:채팅메시지, 301: 방입장, 302:방생성, 307: 사용자 리스트 뿌리기, 308:방 입장 가능여부
 	public String code;
 	public String UserName;
 	public String data;

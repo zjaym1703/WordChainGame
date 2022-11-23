@@ -49,6 +49,7 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	private JPanel contentPanel;
 	private JPanel UserListPanel;
+	private JLabel peopleLabel;
 
 	// image
 	private Image background = new ImageIcon("images/background1.png").getImage();
@@ -193,7 +194,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 
-		JLabel peopleLabel = new JLabel(roomCount + " / 6");
+		peopleLabel = new JLabel(roomCount + " / 6");
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 
@@ -362,11 +363,12 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		
+		System.out.println("roomCount : " + roomCount);
 		if (roomManager.equals(UserName)) { // 방장만 시작 버튼 누르기
 			gameStartBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					System.out.println("1");
 					start = true;
 					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
 					obcm.SetRoomNumber(roomNumber);
@@ -417,6 +419,12 @@ public class WordChainGameClientRoomView extends JFrame {
 		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
 		ImageIcon xyimg = new ImageIcon(yimg);
 		return xyimg;
+	}
+	
+	public void settingRoomInfo(String list) {
+		String data[] = list.split("#");
+		String Inwon = data[3];
+		peopleLabel.setText(Inwon + " / 6");
 	}
 	
 	// 방에서 퇴장한 유저 삭제하는 함수
