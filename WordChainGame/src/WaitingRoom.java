@@ -270,7 +270,7 @@ public class WaitingRoom extends JFrame {
 						setVisible(false);
 						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
 						gameRoomView.addUser((String)cm.data);
-//						gameRoomView.settingRoomInfo((String)cm.data);
+						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
 					case "302": // 게임 방 생성되면 리스트에 뿌리기
 						if(cm.roomTitle != null) {
