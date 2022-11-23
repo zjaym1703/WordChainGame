@@ -118,10 +118,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		// imgBtn.addActionListener(action2);
 	}
 
-	public void userSetting(String name) {
-
-	}
-
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -383,6 +379,9 @@ public class WordChainGameClientRoomView extends JFrame {
 					obcm.SetRoomNumber(roomNumber);
 					obcm.onStart = true;
 					waitingRoom.SendObject(obcm);
+					
+					ChatMsg obcm2 = new ChatMsg(UserName, "303", "Playing Game");
+					waitingRoom.SendObject(obcm2);
 					
 					//Thread threadNum = new Thread(scoreLabel);
 					//threadNum.start();
