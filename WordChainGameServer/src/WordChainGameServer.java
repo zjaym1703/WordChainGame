@@ -583,21 +583,22 @@ public class WordChainGameServer extends JFrame {
 					} else if(cm.code.matches("301")) { // 방 입장
 						for(int i = 0; i < RoomVec.size(); i++) {
 							Room room = RoomVec.get(i);
-							if (room.roomCount < 5) { // 최대 다섯명 까지만 입장 가능
-								System.out.println(room.roomTitle + "의 입장한 사람의 수 -> " + room.roomCount);
-								if(room.roomNumber == cm.roomNumber) { // 일치하는 방 찾기
+							
+							if(room.roomNumber == cm.roomNumber) { // 일치하는 방 찾기
+								if (room.roomCount < 5) {
 									myRoom = room;  // 들어간 방 설정
 									myRoom.roomCount++; // 인원수 증가
 									myRoom.setUserList(UserName); // 게임방에 접속한 유저를 추가
 									System.out.println("이 방에 총 " + myRoom.roomCount + "명 들어와 있음, 총 들어잇는 사람" + myRoom.userList);
+									
 									// 유저를 게임방으로 이동시키기
 									WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기
 									GameRoomEnterAlarm(myRoom);
-									break;
 								}
-							}
-							else { // 다섯명 초과일 때 들어갈 수 없는 알림창 뜸
-								CantGameEnterAlarm(UserName);
+								else {
+									CantGameEnterAlarm(UserName);
+								}
+								break;
 							}
 						}
 						
