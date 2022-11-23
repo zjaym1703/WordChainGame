@@ -50,6 +50,7 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	private JPanel contentPanel;
 	public JPanel UserListPanel;
+	private JLabel peopleLabel;
 	public Vector<UserPanel> UserPanelList = new Vector();
 
 	// image
@@ -203,7 +204,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 
-		JLabel peopleLabel = new JLabel(roomCount + " / 6");
+		peopleLabel = new JLabel(roomCount + " / 6");
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 
@@ -427,7 +428,14 @@ public class WordChainGameClientRoomView extends JFrame {
 		ImageIcon xyimg = new ImageIcon(yimg);
 		return xyimg;
 	}
-
+	
+	// 방의 정보 동기화
+	public void settingRoomInfo(String list) {
+		String data[] = list.split("#");
+		roomCount = Integer.parseInt(data[3]);
+		peopleLabel.setText(roomCount + " / 6");
+	}
+	
 	// 타이머 스레드 실행시키는 함수
 	public void startTimer() {
 		System.out.print("타이머 스레드 호출");
@@ -459,14 +467,14 @@ public class WordChainGameClientRoomView extends JFrame {
 		System.out.println(threadNum.toString());
 		threadNum.start();
 	}
-
+	
 	// 타이머 스레드 중지시키는 함수
 	public void stopTimer() {
 		System.out.print("타이머 스레드 중지");
 		runFlag = false;
 		//threadNum.interrupt();
 	}
-
+	
 	// 방에서 퇴장한 유저 삭제하는 함수
 	public void deleteUser(String deleteUser, String list) {
 		String userList[] = list.split("@"); // 나가고 남은 사람들 리스트
