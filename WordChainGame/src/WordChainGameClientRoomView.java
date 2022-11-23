@@ -363,12 +363,10 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		System.out.println("roomCount : " + roomCount);
-		if (roomManager.equals(UserName) && roomCount > 1) { // 방장만 시작 버튼 누르기
+		if (roomManager.equals(UserName)) { // 방장만 시작 버튼 누르기
 			gameStartBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("1");
 					start = true;
 					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
 					obcm.SetRoomNumber(roomNumber);
