@@ -5,7 +5,7 @@ import javax.swing.ImageIcon;
 
 class ChatMsg implements Serializable {
 	private static final long serialVersionUID = 1L;
-	// 100:게임입장, 400:로그아웃, 401:게임 퇴장 200:채팅메시지, 301: 방입장, 302:방생성, 307: 사용자 리스트 뿌리기, 500: Mouse Event
+	// 100:게임입장, 400:로그아웃, 401:게임 퇴장 200:채팅메시지, 301: 방입장, 302:방생성, 307: 사용자 리스트 뿌리기, 308:입장 불가(최대인원 다 참) , 500: Mouse Event
 	public String code;
 	public String UserName;
 	public String data;
@@ -14,7 +14,9 @@ class ChatMsg implements Serializable {
 //	public int pen_size; // pen size
 	public String roomTitle; // 방 이름
 	public int roomNumber; // 방 번호
-	public String deleteUser;
+	public String deleteUser; // 삭제 할 유저
+	public boolean onStart; // 게임 시작한 방
+	public int roomCount;
 
 	public ChatMsg(String UserName, String code, String msg) {
 		this.code = code;

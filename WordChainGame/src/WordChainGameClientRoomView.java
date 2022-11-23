@@ -39,6 +39,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	private String roomName = ""; // 방 이름
 	private int roomCount = 0; // 들어온 방 인원
 	private int userScore;
+	private boolean start;
 	private Vector<UserDTO> user;
 	private UserDTO u;
 
@@ -77,17 +78,23 @@ public class WordChainGameClientRoomView extends JFrame {
 	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName){
 		this.waitingRoom = waitingRoom;
 		this.data = data;
-		System.out.print("waiting : " + waitingRoom.UserName + " ");
-		//1#hi#2#0#user1@user2@
+//		System.out.print("waiting : " + waitingRoom.UserName + " ");
+		// 1#hi#2#0#false#user1@user2@
 		String d[] = data.split("#");
 		this.roomNumber = Integer.parseInt(d[0]);
 		this.roomName = d[1];
 		this.roomCount = Integer.parseInt(d[2]);
 		this.userScore = Integer.parseInt(d[3]);
-		
+		this.start = Boolean.parseBoolean(d[4]);
 		this.UserName = userName;
+
+		if (start) { // 게임 시작한 방 입장 불가능
+			ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
+			obcm.SetRoomNumber(roomNumber);
+			obcm.onStart = start;
+			waitingRoom.SendObject(obcm);
+		}
 		initialize();
-		
 		initListener();
 		
 	}
@@ -502,7 +509,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	// Server에게 network으로 전송
 	public void SendMessage(String msg) {
-		ChatMsg obcm = new ChatMsg(waitingRoom.UserName, "200", msg);
+		ChatMsg obcm = new ChatMsg(UserName, "200", msg);
 		obcm.SetRoomNumber(roomNumber);
 		waitingRoom.SendChatMsg(obcm);
 	}

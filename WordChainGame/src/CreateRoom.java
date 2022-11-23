@@ -17,6 +17,7 @@ public class CreateRoom extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private JFrame createRoom;
+	private WaitingRoom waitingRoom;
 	
 	private ImageIcon screenImage = new ImageIcon("images/createRoom.png");
 	private Image createRoomBackground = screenImage.getImage();
@@ -34,8 +35,9 @@ public class CreateRoom extends JPanel {
 	public String roundNumber; // 라운드 수
 	public String roundTime; // 라운드 시간
 	
-	public CreateRoom(JFrame createRoomFrame) {
+	public CreateRoom(JFrame createRoomFrame, WaitingRoom waitingRoom) {
 		this.createRoom = createRoomFrame;
+		this.waitingRoom = waitingRoom;
 		setLayout(null);
 
 		textField = new JTextField();

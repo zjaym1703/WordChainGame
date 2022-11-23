@@ -40,6 +40,7 @@ public class WaitingRoom extends JFrame {
 	
 	public WordChainGameClientRoomView gameRoomView;
 	public WaitingRoom waitingRoom;
+	private BGM bgm = null;
 //	private CreateRoom createRoom = null;
 //	private JFrame createRoomFrame = null; // 방 만들기 프레임
 	private JScrollPane userScrollPane, roomScrollPane;
@@ -65,6 +66,8 @@ public class WaitingRoom extends JFrame {
 	public WaitingRoom(String userName, String ip_addr, String port_no)  {
 		this.UserName = userName;
 		this.waitingRoom = this;
+		this.bgm = new BGM();
+//		bgm.playMusic("backgroundMusic.wav"); // bgm틀기
 		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -254,6 +257,14 @@ public class WaitingRoom extends JFrame {
 //						}
 //						//
 						break;
+					case "200":
+						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
+						if(cm.UserName.equals(UserName)) {
+							gameRoomView.AppendTextColor(msg,Color.RED);
+						}else {
+							gameRoomView.AppendText(msg);
+						}
+						break;
 					case "301": // 방 입장하는 부분
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
@@ -277,14 +288,11 @@ public class WaitingRoom extends JFrame {
 					case "307": // 사용자 입장 알림 받음
 						gameRoomView.addUser((String)cm.data);
 						break;
-					case "200":
-						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
-						
-						if(cm.UserName.equals(UserName)) {
-							gameRoomView.AppendTextColor(msg,Color.RED);
-						}else {
-							gameRoomView.AppendText(msg);
-						}
+					case "308": // 입장 불가 알림
+						if (cm.data.equals("Full"))
+							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다");
+						else if (cm.data.equals("Started"))
+							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
 						break;
 					case "401":
 						String [] roomRemainUsers = cm.data.split("@");
@@ -341,7 +349,7 @@ public class WaitingRoom extends JFrame {
 			SendObject(obcm);
 			
 			
-//			createRoom = new CreateRoom(createRoomFrame);
+//			createRoom = new CreateRoom(createRoomFrame, waitingRoom);
 //            createRoomFrame = new JFrame();
 //            createRoomFrame.setTitle("방 생성");
 //            createRoomFrame.setContentPane(createRoom);
