@@ -22,6 +22,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 
 import javax.swing.JList;
@@ -34,10 +35,11 @@ public class WaitingRoom extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final int BUF_LEN = 128; // Windows 처럼 BUF_LEN 을 정의
 	public String UserName;
+	public boolean isTurn = false; //턴 입력
 	private Socket socket; // 연결소켓
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
-	
+
 	public WordChainGameClientRoomView gameRoomView;
 	public WaitingRoom waitingRoom;
 	private BGM bgm = null;
@@ -53,7 +55,6 @@ public class WaitingRoom extends JFrame {
 	private String [] header = { "번호", "방 제목", "인원", "게임 유형", "라운드 수", "라운드 시간" };
 	private Vector<String> row; // 행 추가 하는 부분
 	private DefaultTableModel model = new DefaultTableModel(header, 0); // header데이터로 컬럼 모델 생성
-	//
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -259,12 +260,17 @@ public class WaitingRoom extends JFrame {
 						break;
 					case "200":
 						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
+
 						if(cm.UserName.equals(UserName)) {
 							gameRoomView.AppendTextColor(msg,Color.RED);
 						}else {
 							gameRoomView.AppendText(msg);
 						}
 						break;
+
+					case "203": // 답 입력 성공 여부 받
+						break;
+
 					case "301": // 방 입장하는 부분
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
@@ -276,23 +282,37 @@ public class WaitingRoom extends JFrame {
 							String [] title = cm.roomTitle.split(",");	
 							roomList.setListData(title);
 						}
-						
-//						// 추가한 부분
-//						for(int i=0; i < title.length; i++) {
-//							row = new Vector<String>();
-//							row.addElement(title[i]);
-//						}
-//						model.addRow(row);
-//						//
 						break;
-					case "307": // 사용자 입장 알림 받음
-						gameRoomView.addUser((String)cm.data);
+					case "303":
+						msg = cm.data;
+						System.out.println(UserName + " "+msg);
 						break;
 					case "308": // 입장 불가 알림
 						if (cm.data.equals("Full"))
 							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다");
 						else if (cm.data.equals("Started"))
 							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
+					case "304": //제시어 전달 받음 
+						String word = (String)cm.data;
+						gameRoomView.wordLabel.setText(word);
+						break;
+					case "306": // 턴 입력 받음 
+						//타이머 스레드 시작
+						System.out.println(UserName+"님의 턴입니다");
+						if(cm.UserName.equals(UserName)) {
+							waitingRoom.isTurn = true;
+						}else {
+							waitingRoom.isTurn = false;
+						}
+						gameRoomView.setTurnUser(UserName);
+						break;
+					case "307": // 사용자 입장 알림 받음
+						gameRoomView.addUser((String)cm.data);
+						break;
+					case "309": //시간 전달
+						System.out.println(cm.data);
+						timeReset();
+						
 						break;
 					case "401":
 						String [] roomRemainUsers = cm.data.split("@");
@@ -314,6 +334,13 @@ public class WaitingRoom extends JFrame {
 				} // 바깥 catch문끝
 			}
 		}
+	}
+	//실행중인 timer가 있으면 종료 후 다시 시작
+	public void timeReset() {
+		if(gameRoomView.threadNum!=null) { //진행중인 timer 스레드 있으면 멈
+			gameRoomView.stopTimer();
+		}
+		gameRoomView.startTimer();
 	}
 	
 	public void SendChatMsg(ChatMsg obj) {

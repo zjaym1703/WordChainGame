@@ -30,10 +30,10 @@ public class WordChainGameClientRoomView extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private final int second = 30;
-	
+
 	private WaitingRoom waitingRoom;
 	private String data;
-	
+
 	private String UserName; // 유저 이름
 	private int userScore;
 	private int roomNumber = 1; // 방 번호
@@ -43,12 +43,14 @@ public class WordChainGameClientRoomView extends JFrame {
 	private int roundTime; // 라운드 시간
 	private int roundCount; // 라운드 수
 	private boolean start; // 게임 시작 여부
-	
+
+	private int turnNumber = 0;
 	private Vector<UserDTO> user;
 	private UserDTO u;
 
 	private JPanel contentPanel;
-	private JPanel UserListPanel;
+	public JPanel UserListPanel;
+	public Vector<UserPanel> UserPanelList = new Vector();
 
 	// image
 	private Image background = new ImageIcon("images/background1.png").getImage();
@@ -65,23 +67,29 @@ public class WordChainGameClientRoomView extends JFrame {
 	private ImageIcon sendButtonEnteredImage = new ImageIcon("images/sendButtonEntered.png");
 	private ImageIcon gameStartButtonBasicImage = new ImageIcon("images/gameStartButtonBasic.png");
 	private ImageIcon gameStartButtonEnteredImage = new ImageIcon("images/gameStartButtonEntered.png");
-	
+
 	private JButton sendButton = new JButton(sendButtonBasicImage);
-	
+
 	private ImageIcon exitButtonBasicImage = new ImageIcon("images/exitBasicButton.png");
 	private JButton exitButton = new JButton(exitButtonBasicImage);
 	private ImageIcon exitButtonEnteredImage = new ImageIcon("images/exitEnteredButton.png");
 
 	private JTextField textInputField;
 	private JTextPane textArea;
+	public TimerLabel timerLabel;
+	public Thread threadNum;
 
+	public JLabel wordLabel;
+	
+	boolean runFlag = true;
 
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName){
+	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName) {
 		this.waitingRoom = waitingRoom;
 		this.data = data;
+		
 		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
 		String d[] = data.split("#");
 		this.roomNumber = Integer.parseInt(d[0]); // 방 번호
@@ -95,21 +103,22 @@ public class WordChainGameClientRoomView extends JFrame {
 		this.UserName = userName; //// 개인 이름
 
 		initialize();
+
 		initListener();
-		
+
 	}
-	
+
 	private void initListener() {
 		TextSendAction action = new TextSendAction();
 		sendButton.addActionListener(action);
 		textInputField.addActionListener(action);
 		textInputField.requestFocus();
-		//ImageSendAction action2 = new ImageSendAction();
-		//imgBtn.addActionListener(action2);
+		// ImageSendAction action2 = new ImageSendAction();
+		// imgBtn.addActionListener(action2);
 	}
-	
+
 	public void userSetting(String name) {
-		
+
 	}
 
 	/**
@@ -141,7 +150,7 @@ public class WordChainGameClientRoomView extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("채팅");
 		chattingScrollPane.setColumnHeaderView(lblNewLabel);
-		
+
 		textArea = new JTextPane();
 		textArea.setBounds(0, 0, 1, 16);
 		textArea.setEditable(true);
@@ -170,7 +179,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		});
 		contentPanel.add(sendButton);
-		
+
 		exitButton.setBorderPainted(false);
 		exitButton.setContentAreaFilled(false);
 		exitButton.setFocusPainted(false);
@@ -181,6 +190,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				exitButton.setIcon(exitButtonEnteredImage);
 				exitButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) { // 마우스가 버튼 밖으로 나갈 때
 				exitButton.setIcon(exitButtonBasicImage);
@@ -216,7 +226,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		scorePanel.setLayout(null);
 		contentPanel.add(scorePanel);
 
-		JLabel wordLabel = new JLabel("단어");
+		wordLabel = new JLabel("단어");
 		wordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		wordLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 30));
 		wordLabel.setForeground(new Color(251, 255, 250));
@@ -233,14 +243,14 @@ public class WordChainGameClientRoomView extends JFrame {
 		timerPanel.setBounds(611, 107, 70, 70);
 		timerPanel.setLayout(null);
 
-		TimerLabel scoreLabel = new TimerLabel(second);
-		scoreLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
-		scoreLabel.setForeground(new Color(251, 255, 250));
-		scoreLabel.setBounds(6, 15, 58, 49);
+		timerLabel = new TimerLabel(second);
+		timerLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
+		timerLabel.setForeground(new Color(251, 255, 250));
+		timerLabel.setBounds(6, 15, 58, 49);
 
-		timerPanel.add(scoreLabel);
+		timerPanel.add(timerLabel);
 		contentPanel.add(timerPanel);
-		
+
 		// 이미지 버튼 추가
 		happyEmo = imageSetSize(happyEmo, 30, 30);
 		JButton happyemoButton = new JButton();
@@ -300,7 +310,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				supriseButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		
+
 		contentPanel.add(supriseButton);
 
 		sleepEmo = imageSetSize(sleepEmo, 30, 30);
@@ -356,13 +366,13 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setIcon(gameStartButtonEnteredImage);
 				gameStartBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			}
+
 			@Override
 			public void mouseExited(MouseEvent e) { // 마우스가 버튼 밖으로 나갈 때
 				gameStartBtn.setIcon(gameStartButtonBasicImage);
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		
 		if (roomManager.equals(UserName)) { // 방장만 시작 버튼 누르기
 			gameStartBtn.addActionListener(new ActionListener() {
 				@Override
@@ -373,30 +383,29 @@ public class WordChainGameClientRoomView extends JFrame {
 					obcm.onStart = true;
 					waitingRoom.SendObject(obcm);
 					
-					Thread threadNum = new Thread(scoreLabel);
-					threadNum.start();
+					//Thread threadNum = new Thread(scoreLabel);
+					//threadNum.start();
 				}
 				
 			});
 		}
 		contentPanel.add(gameStartBtn);
-		
-		//사용자리스트
+
+		// 사용자리스트
 		UserListPanel = new JPanel();
 		UserListPanel.setBounds(31, 229, 645, 165);
 		UserListPanel.setLayout(null);
-		UserListPanel.setBackground(new Color(0,0,0,0));
-		
+		UserListPanel.setBackground(new Color(0, 0, 0, 0));
+
 		contentPanel.add(UserListPanel);
-		
 
 		RoomExitCreateAction roomExitCreateAction = new RoomExitCreateAction();
 		exitButton.addActionListener(roomExitCreateAction);
-		
+
 		revalidate();
 		repaint();
 	}
-	
+
 	class RoomExitCreateAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -418,57 +427,100 @@ public class WordChainGameClientRoomView extends JFrame {
 		ImageIcon xyimg = new ImageIcon(yimg);
 		return xyimg;
 	}
-	
+
+	// 타이머 스레드 실행시키는 함수
+	public void startTimer() {
+		System.out.print("타이머 스레드 호출");
+		runFlag = true;
+
+		threadNum = new Thread(new Runnable() {
+
+			int second = 30;
+			
+			@Override
+			public void run() {
+				while(runFlag) {
+					try {
+						if (second > 0) {
+							second -= 1;
+							System.out.print(second);
+							timerLabel.setText(Integer.toString(second));
+							Thread.sleep(1000);		
+						}else {
+							break;
+						}
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						Thread.interrupted();
+					}
+				}	
+			}
+		});
+
+		System.out.println(threadNum.toString());
+		threadNum.start();
+	}
+
+	// 타이머 스레드 중지시키는 함수
+	public void stopTimer() {
+		System.out.print("타이머 스레드 중지");
+		runFlag = false;
+		//threadNum.interrupt();
+	}
+
 	// 방에서 퇴장한 유저 삭제하는 함수
 	public void deleteUser(String deleteUser, String list) {
 		String userList[] = list.split("@"); // 나가고 남은 사람들 리스트
 
 		if (userList != null) {
-			for(int i=0; i<user.size(); i++) {
+			for (int i = 0; i < user.size(); i++) {
 				UserDTO userInfo = user.get(i);
-				if(userInfo.getName().equals(deleteUser)) {
+				if (userInfo.getName().equals(deleteUser)) {
 					user.remove(userInfo);
 				}
 			}
 			addUserPanel(user);
 		}
 	}
-	
+
 	public void addUser(String list) {
 		String data[] = list.split("#");
-		String userList[] = data[data.length-1].split("@");
-		
+		String userList[] = data[data.length - 1].split("@");
+
 		user = new Vector<UserDTO>();
 		// 받아온 문자열
+
 		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
-		if(data != null) {
-			for(int i = 0; i < userList.length; i++) {
+		// 1#hi#2#0#user1@user2@
+		if (data != null) {
+			for (int i = 0; i < userList.length; i++) {
 				u = new UserDTO(userList[i], userScore, "O");
 				user.add(u);
 			}
 			addUserPanel(user);
 		}
-		
+
 	}
-	
+
 	public void addUserPanel(Vector<UserDTO> list) {
 		UserListPanel.removeAll();
 		int userPanelX = 0;
 		int userPanelY = 0;
-		
-		for(int i=0;i<list.size();i++) {
-			UserPanel user = new UserPanel(userPanelX,userPanelY);
+
+		for (int i = 0; i < list.size(); i++) {
+			UserPanel user = new UserPanel(userPanelX, userPanelY);
 			user.setName(list.get(i).getName());
 			user.setScore(list.get(i).getScore());
-//			System.out.println("user : "+user.getName()+" width :"+userPanelX);
+
 			UserListPanel.add(user);
-			
+			UserPanelList.add(user); // 외부에서 패널 접근하기 위한 함
 			userPanelX += user.width + 5;
 		}
+
 		contentPanel.revalidate();
 		contentPanel.repaint();
 	}
-	
+
 	// 화면에 출력
 	public void AppendText(String msg) {
 		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
@@ -477,26 +529,26 @@ public class WordChainGameClientRoomView extends JFrame {
 		textArea.setCaretPosition(len);
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.black);
-		textArea.setCharacterAttributes(aset,false);
+		textArea.setCharacterAttributes(aset, false);
 		textArea.replaceSelection(msg + "\n");
 	}
-		
+
 	public void AppendTextColor(String msg, Color c) {
-		//색상 선택 
+		// 색상 선택
 		StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
-        
-        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
-        
+		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
 		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
 		int len = textArea.getDocument().getLength();
 		// 끝으로 이동
 		textArea.setCaretPosition(len);
-		textArea.setCharacterAttributes(aset,false);
+		textArea.setCharacterAttributes(aset, false);
 		textArea.replaceSelection(msg + "\n");
-		
+
 	}
-	
+
 	// keyboard enter key 치면 서버로 전송
 	class TextSendAction implements ActionListener {
 		@Override
@@ -504,53 +556,73 @@ public class WordChainGameClientRoomView extends JFrame {
 			// Send button을 누르거나 메시지 입력하고 Enter key 치면
 			if (e.getSource() == sendButton || e.getSource() == textInputField) {
 				String msg = null;
-				 msg = textInputField.getText();
-				 System.out.println("메시지 전송 : "+msg);
-				 SendMessage(msg);
-				 textInputField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
-				 textInputField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
+				msg = textInputField.getText();
+				System.out.println("메시지 전송 : " + msg);
+				if (waitingRoom.isTurn) { // 내 차례일
+					System.out.println("답 ::" + msg);
+					SendAnswerMessage(msg);
+					// 턴 변경
+					setTurnUser(UserName);
+				} else {
+					System.out.println("일반 채팅 ::" + msg);
+					SendMessage(msg);
+				}
+
+				textInputField.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
+				textInputField.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
 				if (msg.contains("/exit")) // 종료 처리
 					System.exit(0);
 			}
 		}
 	}
-	
+
+	// 턴 변경
+	public void setTurnUser(String userName) {
+		UserPanel u = null;
+		for (int i = 0; i < UserPanelList.size(); i++) {
+			u = (UserPanel) UserPanelList.elementAt(i);
+			if (u.getName().equals(userName)) {
+				break;
+			}
+		}
+
+		if (waitingRoom.isTurn) {
+			Color c = new Color(224, 252, 219);
+			u.setBackground(c);
+			System.out.println("색상 변경 : "+u.getName());
+		} else {
+			u.setBackground(Color.gray);
+			System.out.println("색상 변경 : "+u.getName());
+		}
+
+		revalidate();
+		repaint();
+	}
+
 	// Server에게 network으로 전송
 	public void SendMessage(String msg) {
 		ChatMsg obcm = new ChatMsg(UserName, "200", msg);
 		obcm.SetRoomNumber(roomNumber);
 		waitingRoom.SendChatMsg(obcm);
 	}
-	
 
-	class TimerLabel extends JLabel implements Runnable {
+	// Server에게 network으로 답 전송
+	public void SendAnswerMessage(String msg) {
+		ChatMsg obcm = new ChatMsg(waitingRoom.UserName, "203", msg);
+		obcm.SetRoomNumber(roomNumber);
+		waitingRoom.SendChatMsg(obcm);
+	}
+
+	public class TimerLabel extends JLabel{
 
 		int second;
+		//public boolean runFlag = true;
 
 		public TimerLabel(int second) {
 			setText(Integer.toString(second));
 			setHorizontalAlignment(JLabel.CENTER);
 			this.second = second;
 		}
-
-		@Override
-		public void run() {
-			while (true) {
-				try {
-					Thread.sleep(1000);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				if (second > 0) {
-					second -= 1;
-					setText(Integer.toString(second));
-				} else {
-
-					break;
-				}
-			}
-		}
-
 	}
+	
 }
