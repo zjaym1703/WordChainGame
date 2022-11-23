@@ -86,6 +86,11 @@ class UserPanel extends JPanel{
 		
 		
 	}
+
+	public String getName() {
+		return name;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 		nameLabel.setText(name);
@@ -95,4 +100,5 @@ class UserPanel extends JPanel{
 		this.score = score;
 		scoreLabel.setText(Integer.toString(score));
 	}
+
 }
