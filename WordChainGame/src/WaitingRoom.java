@@ -293,14 +293,15 @@ public class WaitingRoom extends JFrame {
 						gameRoomView.wordLabel.setText(word);
 						break;
 					case "306": // 턴 입력 받음 
+						String turnMember = cm.data;
 						//타이머 스레드 시작
-						System.out.println(UserName+"님의 턴입니다");
-						if(cm.UserName.equals(UserName)) {
+						System.out.println(turnMember+"님의 턴입니다");
+						if(UserName.equals(turnMember)) {
 							waitingRoom.isTurn = true;
 						}else {
 							waitingRoom.isTurn = false;
 						}
-						gameRoomView.setTurnUser(UserName);
+						gameRoomView.setTurnUser(turnMember);
 						break;
 					case "307": // 사용자 입장 알림 받음
 						gameRoomView.addUser((String)cm.data);
@@ -313,9 +314,11 @@ public class WaitingRoom extends JFrame {
 							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
 						break;
 					case "309": //시간 전달
-						System.out.println(cm.data);
-						timeReset();
-						
+						//실행중인 timer가 있으면 종료 후 다시 시작
+						if(gameRoomView.threadNum!=null) { //진행중인 timer 스레드 있으면 멈
+							gameRoomView.stopTimer();
+						}
+						gameRoomView.startTimer();
 						break;
 					case "401":
 						String [] roomRemainUsers = cm.data.split("@");
@@ -337,13 +340,6 @@ public class WaitingRoom extends JFrame {
 				} // 바깥 catch문끝
 			}
 		}
-	}
-	//실행중인 timer가 있으면 종료 후 다시 시작
-	public void timeReset() {
-		if(gameRoomView.threadNum!=null) { //진행중인 timer 스레드 있으면 멈
-			gameRoomView.stopTimer();
-		}
-		gameRoomView.startTimer();
 	}
 	
 	public void SendChatMsg(ChatMsg obj) {

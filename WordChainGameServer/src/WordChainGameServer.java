@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
@@ -37,6 +38,8 @@ public class WordChainGameServer extends JFrame {
 	private Vector<String> WaitUserVec = new Vector<String>(); // 접속자 리스트를 저장하는 벡터
 	private Vector<Room> RoomVec = new Vector<Room>(); // 모든 방 리스트를 담는 벡터
 	private Vector RoomUserListVec = new Vector();
+	private HashMap<Integer, Integer> RoomTurnList = new HashMap<Integer,Integer>();
+	
 	private Room myRoom; // 유저가 입장한 대화방
 	private int totalRoomCount = 0;
 	private int roomUserListSeq = 0;
@@ -205,20 +208,23 @@ public class WordChainGameServer extends JFrame {
 		
 		// 클라이언트에게 턴 알려주기
 		public void AlarmToTurn(int roomNumber,UserService u) {
+			String msg =roomNumber+"번째 방의 턴 :"+u.getName();
+			AppendText(msg);
 			u.setTurn(true);// turn을 변경 
 			System.out.println("현재 턴 사용자 : "+u.UserName+", 턴 플래그 "+u.isTurn);
 			for(int i=0;i<RoomUserListVec.size();i++) {
 				UserService us = (UserService) RoomUserListVec.elementAt(i);
 				us.AlarmToTurnOne(roomNumber,u.UserName);
+				us.sendWordAll(); //제시어 호출 메소드
 			}
 		}
 		
 		public void AlarmToTurnOne(int roomNumber,String userName) {
 			try {
-				ChatMsg obcm = new ChatMsg(userName, "306", "isTurn");
+				ChatMsg obcm = new ChatMsg("SEVER", "306", userName);
 				obcm.SetRoomNumber(roomNumber);
 				oos.writeObject(obcm);
-				AppendText(roomNumber+"번째 턴 : "+userName);
+				AppendText(roomNumber+"번째 방 턴: "+userName);
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
 				try {
@@ -511,34 +517,6 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		
-		public void gameStartAll(int roomNumber) {
-			for(int i=0;i<RoomUserListVec.size();i++) {
-				UserService u = (UserService) RoomUserListVec.elementAt(i);
-				u.gameStart(roomNumber);
-			}
-		}
-		
-		public void gameStart(int roomNumber) {
-			try {
-				ChatMsg obcm = new ChatMsg("Server", "303", "start");
-				obcm.SetRoomNumber(roomNumber);
-				oos.writeObject(obcm);
-			} catch (IOException e) {
-				AppendText("dos.writeObject() error");
-				try {
-					ois.close();
-					oos.close();
-					client_socket.close();
-					client_socket = null;
-					ois = null;
-					oos = null;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
-			}
-		}
-		
 		// 현재 접속자 리스트 전송
 		public void EnterAlarmOne(String msg) {
 			try {
@@ -674,24 +652,7 @@ public class WordChainGameServer extends JFrame {
 				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
 		}
-		
-//		class Timer extends Thread {
-//	        @Override
-//	        public void run() {
-//	            try {
-//	                for (int i = 30; i >= 0; i--) {
-//	                	sendTimeAll(i);
-//	                    this.sleep(1000);
-//	                }
-//	            } catch (InterruptedException ie) {
-//	            	
-//	            }
-//	
-//	        }
-//	        
-//	    }
-//		
-		
+
 		public void run() {
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
 				try {
@@ -765,23 +726,24 @@ public class WordChainGameServer extends JFrame {
 					}else if(cm.code.matches("203")) { //답 입력 
 						msg = String.format("[%s] %s", cm.UserName, cm.data);
 						AppendText(msg);
-						int roomNumber = cm.roomNumber;
-						//턴 변경
-						if(roomUserListSeq == RoomUserListVec.size()) {
-							roomUserListSeq = 0;
+						
+						roomNumber = (int)cm.roomNumber;
+						RoomUserListVec = getRoomUserList(roomNumber);
+						
+						int user_seq = RoomTurnList.get(roomNumber);
+						user_seq++;
+						if(user_seq == RoomUserListVec.size()) {
+							user_seq = 0;//초기화 
 						}
-						UserService u = (UserService) RoomUserListVec.elementAt(roomUserListSeq++);
-						u.setTurn(false);
+						
+						RoomTurnList.put(roomNumber, user_seq); //방마다 턴을 저장함 
+					
+						UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
+						//u.setTurn(false);
 						
 						AlarmToTurn(roomNumber,u); //턴 전송 
 						sendTimeAll();
-						
-//						//타이머 초기
-//						if(timer!=null) {
-//							timer.interrupt();
-//						}
-//						timer = new Timer();
-//				        timer.start();
+
 					}else if(cm.code.matches("301")) { // 방 입장
 						for(int i = 0; i < RoomVec.size(); i++) {
 							Room room = RoomVec.get(i);
@@ -827,21 +789,15 @@ public class WordChainGameServer extends JFrame {
 						
 					} else if(cm.code.matches("303")) { //게임시작 
 						AppendText(msg);
-						roomUserListSeq = 0;
-						
 						roomNumber = (int)cm.roomNumber;
 						RoomUserListVec = getRoomUserList(roomNumber);
-						UserService u = (UserService) RoomUserListVec.elementAt(roomUserListSeq++);
-						AlarmToTurn(roomNumber,u);
-						sendWordAll(); //제시어 호출 메소드 
-						gameStartAll(roomNumber);
+						
+						int user_seq = 0; //게임시작했을때 턴은 0으로 
+						RoomTurnList.put(roomNumber, user_seq); //방마다 턴을 저장함 
+						
+						UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
+						AlarmToTurn(roomNumber,u); 
 						sendTimeAll();
-//						//타이머 시작
-//						if(timer!=null) {
-//							timer.interrupt();
-//						}
-//						timer = new Timer();
-//				        timer.start();
 						
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();

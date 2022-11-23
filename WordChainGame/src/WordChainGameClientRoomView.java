@@ -375,7 +375,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					start = true;
-					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
+					ChatMsg obcm = new ChatMsg(UserName, "303", "Game started");
 					obcm.SetRoomNumber(roomNumber);
 					obcm.onStart = true;
 					waitingRoom.SendObject(obcm);
@@ -450,7 +450,6 @@ public class WordChainGameClientRoomView extends JFrame {
 					try {
 						if (second > 0) {
 							second -= 1;
-							System.out.print(second);
 							timerLabel.setText(Integer.toString(second));
 							Thread.sleep(1000);		
 						}else {
@@ -569,7 +568,7 @@ public class WordChainGameClientRoomView extends JFrame {
 					System.out.println("답 ::" + msg);
 					SendAnswerMessage(msg);
 					// 턴 변경
-					setTurnUser(UserName);
+					//setTurnUser(UserName);
 				} else {
 					System.out.println("일반 채팅 ::" + msg);
 					SendMessage(msg);
@@ -589,21 +588,14 @@ public class WordChainGameClientRoomView extends JFrame {
 		for (int i = 0; i < UserPanelList.size(); i++) {
 			u = (UserPanel) UserPanelList.elementAt(i);
 			if (u.getName().equals(userName)) {
-				break;
+				Color c = new Color(224, 252, 219);
+				u.setBackground(c);
+			} else {
+				u.setBackground(Color.gray);
 			}
+			revalidate();
+			repaint();
 		}
-
-		if (waitingRoom.isTurn) {
-			Color c = new Color(224, 252, 219);
-			u.setBackground(c);
-			System.out.println("색상 변경 : "+u.getName());
-		} else {
-			u.setBackground(Color.gray);
-			System.out.println("색상 변경 : "+u.getName());
-		}
-
-		revalidate();
-		repaint();
 	}
 
 	// Server에게 network으로 전송
