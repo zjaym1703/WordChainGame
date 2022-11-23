@@ -375,7 +375,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					start = true;
-					ChatMsg obcm = new ChatMsg(UserName, "303", "Game started");
+					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
 					obcm.SetRoomNumber(roomNumber);
 					obcm.onStart = true;
 					waitingRoom.SendObject(obcm);
