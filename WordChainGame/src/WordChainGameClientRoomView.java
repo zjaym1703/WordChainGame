@@ -35,11 +35,15 @@ public class WordChainGameClientRoomView extends JFrame {
 	private String data;
 	
 	private String UserName; // 유저 이름
-	private int roomNumber = 1; // 방 번호
-	private String roomName = ""; // 방 이름
-	private int roomCount = 0; // 들어온 방 인원
 	private int userScore;
-	private boolean start;
+	private int roomNumber = 1; // 방 번호
+	private String roomTitle; // 방 제목
+	private String roomManager; // 방장
+	private int roomCount = 0; // 들어온 방 인원
+	private int roundTime; // 라운드 시간
+	private int roundCount; // 라운드 수
+	private boolean start; // 게임 시작 여부
+	
 	private Vector<UserDTO> user;
 	private UserDTO u;
 
@@ -78,15 +82,17 @@ public class WordChainGameClientRoomView extends JFrame {
 	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName){
 		this.waitingRoom = waitingRoom;
 		this.data = data;
-//		System.out.print("waiting : " + waitingRoom.UserName + " ");
-		// 1#hi#2#0#false#user1@user2@
+		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
 		String d[] = data.split("#");
-		this.roomNumber = Integer.parseInt(d[0]);
-		this.roomName = d[1];
-		this.roomCount = Integer.parseInt(d[2]);
-		this.userScore = Integer.parseInt(d[3]);
-		this.start = Boolean.parseBoolean(d[4]);
-		this.UserName = userName;
+		this.roomNumber = Integer.parseInt(d[0]); // 방 번호
+		this.roomTitle = d[1]; // 방 제목
+		this.roomManager = d[2]; // 방장
+		this.roomCount = Integer.parseInt(d[3]); // 들어온 인원수
+		this.roundTime = Integer.parseInt(d[4]); // 라운드 시간
+		this.roundCount = Integer.parseInt(d[5]); // 라운드 수
+		this.userScore = Integer.parseInt(d[6]); // 개인 점수
+		this.start = Boolean.parseBoolean(d[7]); // 게임 시작 상태
+		this.UserName = userName; // 개인 이름
 
 		if (start) { // 게임 시작한 방 입장 불가능
 			ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
@@ -189,7 +195,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		});
 		contentPanel.add(exitButton);
 
-		JLabel roomNameLabel = new JLabel(this.roomName);
+		JLabel roomNameLabel = new JLabel(roomTitle);
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 
@@ -197,7 +203,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 
-		JLabel countLabel = new JLabel("60초");
+		JLabel countLabel = new JLabel(roundTime + "초");
 		countLabel.setBounds(643, 21, 38, 16);
 		contentPanel.add(countLabel);
 
@@ -362,6 +368,7 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+//		if ()
 		gameStartBtn.addActionListener(new ActionListener() {
 
 			@Override
@@ -431,10 +438,10 @@ public class WordChainGameClientRoomView extends JFrame {
 		String userList[] = data[data.length-1].split("@");
 		
 		user = new Vector<UserDTO>();
-		//받아온 문자열
-		//1#hi#2#0#user1@user2@
+		// 받아온 문자열
+		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
 		if(data != null) {
-			for(int i=0; i<userList.length; i++) {
+			for(int i = 0; i < userList.length; i++) {
 				u = new UserDTO(userList[i], userScore, "O");
 				user.add(u);
 			}

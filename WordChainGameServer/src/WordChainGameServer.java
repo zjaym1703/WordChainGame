@@ -183,7 +183,10 @@ public class WordChainGameServer extends JFrame {
 			String tmp = "";
 			tmp += myRoom.roomNumber + "#";
 			tmp += myRoom.roomTitle + "#";
+			tmp += myRoom.roomManager + "#";
 			tmp += myRoom.roomCount + "#";
+			tmp += myRoom.roundTime + "#";
+			tmp += myRoom.roundCount + "#";
 			tmp += UserScore + "#";
 			tmp += myRoom.start + "#";
 			tmp += myRoom.userList;
@@ -192,7 +195,7 @@ public class WordChainGameServer extends JFrame {
 		
 		// 게임 방 입장 알림
 		public void GameRoomEnterAlarm(Room myRoom) {
-			// 방번호#방제목#들어온 인원수#점수#게임시작상태#user1@user2@
+			// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
 			String tmp = RoomInfo(myRoom);
 			String [] users = myRoom.userList.split("@");
 			
@@ -219,10 +222,10 @@ public class WordChainGameServer extends JFrame {
 		
 		// 일반유저가 방을 나갈때 방안에 있는 유저들에게 방송
 		public void RoomExit(Room myRoom, String deleteUser) {
-			// 방번호#방제목#들어온 인원수#점수#게임시작상태#user1@user2@
+			// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
 			String tmp = RoomInfo(myRoom);
 			if(myRoom.userList.contains("@")) {
-				String userlist = tmp.split("#")[5];
+				String userlist = tmp.split("#")[8];
 				String [] users = userlist.split("@");
 				
 				for(int i = 0; i < user_vc.size(); i++) {
@@ -585,7 +588,7 @@ public class WordChainGameServer extends JFrame {
 							Room room = RoomVec.get(i);
 							
 							if(room.roomNumber == cm.roomNumber) { // 일치하는 방 찾기
-								if (room.roomCount < 5) {
+								if (room.roomCount < 5) { // 최대 5명만 입장 가능
 									myRoom = room;  // 들어간 방 설정
 									myRoom.roomCount++; // 인원수 증가
 									myRoom.setUserList(UserName); // 게임방에 접속한 유저를 추가
@@ -605,7 +608,6 @@ public class WordChainGameServer extends JFrame {
 					} else if(cm.code.matches("302")) { // 방 만들기 처리
 						myRoom = new Room(); // 새로운 방 생성
 						myRoom.roomNumber = totalRoomCount++; // 1번 방
-						System.out.println("방 생성 : " + myRoom.roomNumber + "번째 방");
 						myRoom.roomTitle = cm.roomTitle; // 방 제목 저장
 						myRoom.roomManager = UserName; // 방장 설정
 						myRoom.roomCount += 1; // 방 인원 수 증가

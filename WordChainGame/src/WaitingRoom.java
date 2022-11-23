@@ -296,7 +296,7 @@ public class WaitingRoom extends JFrame {
 						break;
 					case "401":
 						String [] roomRemainUsers = cm.data.split("@");
-						for(int i=0;i<roomRemainUsers.length;i++) {
+						for(int i = 0; i < roomRemainUsers.length; i++) {
 							gameRoomView.deleteUser(cm.deleteUser, cm.data);
 						}
 						break;
