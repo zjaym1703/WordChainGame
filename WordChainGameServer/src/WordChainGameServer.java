@@ -258,7 +258,7 @@ public class WordChainGameServer extends JFrame {
 					break;
 				}
 			}
-			//test
+			//test2
 			if(userList.length > 0) {
 				for(int i=0;i<user_vc.size();i++) {
 					for(int j=0;j<userList.length;j++) {
