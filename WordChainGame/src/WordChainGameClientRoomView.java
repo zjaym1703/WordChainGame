@@ -90,9 +90,9 @@ public class WordChainGameClientRoomView extends JFrame {
 		this.roomCount = Integer.parseInt(d[3]); // 들어온 인원수
 		this.roundTime = Integer.parseInt(d[4]); // 라운드 시간
 		this.roundCount = Integer.parseInt(d[5]); // 라운드 수
-		this.userScore = Integer.parseInt(d[6]); // 개인 점수
+		this.userScore = Integer.parseInt(d[6]); //// 개인 점수
 		this.start = Boolean.parseBoolean(d[7]); // 게임 시작 상태
-		this.UserName = userName; // 개인 이름
+		this.UserName = userName; //// 개인 이름
 
 		if (start) { // 게임 시작한 방 입장 불가능
 			ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
@@ -368,16 +368,17 @@ public class WordChainGameClientRoomView extends JFrame {
 				gameStartBtn.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-//		if ()
-		gameStartBtn.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Thread threadNum = new Thread(scoreLabel);
-				threadNum.start();
-			}
-			
-		});
+		
+		if (roomManager.equals(UserName)) { // 방장만 시작 버튼 누르기
+			gameStartBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Thread threadNum = new Thread(scoreLabel);
+					threadNum.start();
+				}
+				
+			});
+		}
 		contentPanel.add(gameStartBtn);
 		
 		//사용자리스트
