@@ -54,39 +54,39 @@ public class WordChainGameClientMain extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("NickName");
-		lblNewLabel.setBounds(42, 241, 82, 33);
+		lblNewLabel.setBounds(49, 241, 82, 33);
 		contentPane.add(lblNewLabel);
 		
 		txtUserNickname = new JTextField();
 		txtUserNickname.setHorizontalAlignment(SwingConstants.CENTER);
-		txtUserNickname.setBounds(131, 241, 116, 33);
+		txtUserNickname.setBounds(138, 241, 116, 33);
 		contentPane.add(txtUserNickname);
 		txtUserNickname.setColumns(10);
 		
 		JLabel lblIpAddress = new JLabel("IP Address");
-		lblIpAddress.setBounds(42, 284, 82, 33);
+		lblIpAddress.setBounds(49, 284, 82, 33);
 		contentPane.add(lblIpAddress);
 		
 		txtIpAddress = new JTextField();
 		txtIpAddress.setHorizontalAlignment(SwingConstants.CENTER);
 		txtIpAddress.setText("127.0.0.1");
 		txtIpAddress.setColumns(10);
-		txtIpAddress.setBounds(131, 284, 116, 33);
+		txtIpAddress.setBounds(138, 284, 116, 33);
 		contentPane.add(txtIpAddress);
 		
 		JLabel lblPortNumber = new JLabel("Port Number");
-		lblPortNumber.setBounds(42, 327, 82, 33);
+		lblPortNumber.setBounds(49, 327, 82, 33);
 		contentPane.add(lblPortNumber);
 		
 		txtPortNumber = new JTextField();
 		txtPortNumber.setText("30000");
 		txtPortNumber.setHorizontalAlignment(SwingConstants.CENTER);
 		txtPortNumber.setColumns(10);
-		txtPortNumber.setBounds(131, 327, 116, 33);
+		txtPortNumber.setBounds(138, 327, 116, 33);
 		contentPane.add(txtPortNumber);
 		
 		JButton btnConnect = new JButton("Connect");
-		btnConnect.setBounds(42, 384, 205, 38);
+		btnConnect.setBounds(49, 384, 205, 38);
 		contentPane.add(btnConnect);
 		Myaction action = new Myaction();
 		btnConnect.addActionListener(action);

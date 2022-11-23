@@ -240,11 +240,11 @@ public class WordChainGameServer extends JFrame {
 		}
 		
 		// 방에 들어갈 수 없음을 알림
-		public void CantGameEnterAlarm(String UserName) {
+		public void CantGameEnterAlarm(String UserName, String type) {
 			for(int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i);
 				if(user.UserName.equals(UserName)) {
-					user.CantGameEnterAlarmOne();
+					user.CantGameEnterAlarmOne(type);
 					break;
 				}
 			}
@@ -319,10 +319,15 @@ public class WordChainGameServer extends JFrame {
 			return packet;
 		}
 		
-		public void CantGameEnterAlarmOne() {
+		public void CantGameEnterAlarmOne(String type) {
 			try {
-				ChatMsg r_ob = new ChatMsg(UserName, "308", "Full");
-				oos.writeObject(r_ob);
+				if (type.equals("Full")) {
+					ChatMsg r_ob = new ChatMsg(UserName, "308", "Full");
+					oos.writeObject(r_ob);
+				} else if (type.equals("Started")) {
+					ChatMsg r_ob = new ChatMsg(UserName, "308", "Started");
+					oos.writeObject(r_ob);
+				}
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
 				try {
@@ -588,7 +593,11 @@ public class WordChainGameServer extends JFrame {
 							Room room = RoomVec.get(i);
 							
 							if(room.roomNumber == cm.roomNumber) { // 일치하는 방 찾기
-								if (room.roomCount < 5) { // 최대 5명만 입장 가능
+								if (cm.onStart == true) { // 해당 방 방장이 게임 시작 버튼을 눌렀을 때 입장 불가
+									room.start = true;
+									break;
+								}
+								if (room.roomCount < 5 && room.start == false) { // 최대 5명만 입장 가능
 									myRoom = room;  // 들어간 방 설정
 									myRoom.roomCount++; // 인원수 증가
 									myRoom.setUserList(UserName); // 게임방에 접속한 유저를 추가
@@ -599,7 +608,10 @@ public class WordChainGameServer extends JFrame {
 									GameRoomEnterAlarm(myRoom);
 								}
 								else {
-									CantGameEnterAlarm(UserName);
+									if (room.start == true)
+										CantGameEnterAlarm(UserName, "Started");
+									else
+										CantGameEnterAlarm(UserName, "Full");
 								}
 								break;
 							}

@@ -94,12 +94,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		this.start = Boolean.parseBoolean(d[7]); // 게임 시작 상태
 		this.UserName = userName; //// 개인 이름
 
-		if (start) { // 게임 시작한 방 입장 불가능
-			ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
-			obcm.SetRoomNumber(roomNumber);
-			obcm.onStart = start;
-			waitingRoom.SendObject(obcm);
-		}
 		initialize();
 		initListener();
 		
@@ -373,6 +367,12 @@ public class WordChainGameClientRoomView extends JFrame {
 			gameStartBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					start = true;
+					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
+					obcm.SetRoomNumber(roomNumber);
+					obcm.onStart = true;
+					waitingRoom.SendObject(obcm);
+					
 					Thread threadNum = new Thread(scoreLabel);
 					threadNum.start();
 				}
