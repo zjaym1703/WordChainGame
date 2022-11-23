@@ -288,6 +288,7 @@ public class WaitingRoom extends JFrame {
 						break;
 					case "307": // 사용자 입장 알림 받음
 						gameRoomView.addUser((String)cm.data);
+						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
 					case "308": // 입장 가능 여부
 						if (cm.data.equals("Full"))

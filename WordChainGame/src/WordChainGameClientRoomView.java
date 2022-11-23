@@ -364,7 +364,7 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		});
 		System.out.println("roomCount : " + roomCount);
-		if (roomManager.equals(UserName)) { // 방장만 시작 버튼 누르기
+		if (roomManager.equals(UserName) && roomCount > 1) { // 방장만 시작 버튼 누르기
 			gameStartBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -421,10 +421,11 @@ public class WordChainGameClientRoomView extends JFrame {
 		return xyimg;
 	}
 	
+	// 방의 정보 동기화
 	public void settingRoomInfo(String list) {
 		String data[] = list.split("#");
-		String Inwon = data[3];
-		peopleLabel.setText(Inwon + " / 6");
+		roomCount = Integer.parseInt(data[3]);
+		peopleLabel.setText(roomCount + " / 6");
 	}
 	
 	// 방에서 퇴장한 유저 삭제하는 함수

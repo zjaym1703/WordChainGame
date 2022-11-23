@@ -276,39 +276,6 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		
-//		public void RoomInfoAlarmAll(Room room) {
-//			String [] tmp = room.userList.split("@");
-//			for (int i = 0; i < user_vc.size(); i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				if (user.UserName.equals(tmp[i])) {
-//					user.RoomInfoAlarmOne(room.roomCount);
-//				}
-////				if (user.UserStatus == "O")
-////					user.RoomInfoAlarmOne(tmp);
-//			}
-//		}
-//		
-//		public void RoomInfoAlarmOne(int roomCount) {
-//			try {
-//				ChatMsg r_ob = new ChatMsg(UserName, "308", "roomInfo");
-//				r_ob.roomCount = roomCount;
-//				oos.writeObject(r_ob);
-//			} catch (IOException e) {
-//				AppendText("dos.writeObject() error");
-//				try {
-//					ois.close();
-//					oos.close();
-//					client_socket.close();
-//					client_socket = null;
-//					ois = null;
-//					oos = null;
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-//				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
-//			}
-//		}
-		
 		// 모든 User들에게 방송. 각각의 UserService Thread의 WriteOne() 을 호출한다.
 		public void WriteAll(String str) {
 			for (int i = 0; i < user_vc.size(); i++) {
@@ -639,7 +606,6 @@ public class WordChainGameServer extends JFrame {
 									// 유저를 게임방으로 이동시키기
 									WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기
 									GameRoomEnterAlarm(myRoom);
-//									RoomInfoAlarmAll(myRoom);
 								}
 								else {
 									if (room.start == true)
