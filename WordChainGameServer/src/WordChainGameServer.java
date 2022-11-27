@@ -653,6 +653,35 @@ public class WordChainGameServer extends JFrame {
 				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
 		}
+		
+		//게임 시작 버튼
+		public void gameStartAll() {
+			for(int i=0;i<RoomUserListVec.size();i++) {
+				UserService u = (UserService) RoomUserListVec.elementAt(i);
+				u.gameStart();
+			}
+		}
+				
+		//게임 시작 버튼
+		public void gameStart() {
+			try {
+				ChatMsg obcm = new ChatMsg("SERVER", "303", "gameStart");
+				obcm.SetRoomNumber(roomNumber);
+				oos.writeObject(obcm);
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
+		}
 
 		public void run() {
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
@@ -799,7 +828,7 @@ public class WordChainGameServer extends JFrame {
 						UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
 						AlarmToTurn(roomNumber,u); 
 						sendTimeAll();
-						
+						gameStartAll();
 					} else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
