@@ -285,8 +285,9 @@ public class WaitingRoom extends JFrame {
 						}
 						break;
 					case "303":
-						msg = cm.data;
-						System.out.println(UserName + " "+msg);
+						//게임 타이머 300초 설정 & 시작
+						
+						gameRoomView.gameTimerStart();
 						break;
 					case "304": //제시어 전달 받음 
 						String word = (String)cm.data;
