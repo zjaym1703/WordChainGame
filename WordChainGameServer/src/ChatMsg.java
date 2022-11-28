@@ -7,14 +7,13 @@ class ChatMsg implements Serializable {
 	public String code;
 	public String UserName;
 	public String data;
-//	public ImageIcon img;
-//	public MouseEvent mouse_e;
-//	public int pen_size; // pen size
 	public String roomTitle; // 방 이름
 	public int roomNumber; // 방 번호
 	public String deleteUser; // 삭제 할 유저
 	public boolean onStart; // 게임 시작한 방
 	public int roomCount;
+	public String currentQ;
+	public String answerUsername;
 
 	public ChatMsg(String UserName, String code, String msg) {
 		this.code = code;
@@ -32,5 +31,9 @@ class ChatMsg implements Serializable {
 	
 	public void SetDeleteUser(String deleteUser) {
 		this.deleteUser = deleteUser;
+	}
+	
+	public void SetCurrentQ(String currentQ) {
+		this.currentQ = currentQ;
 	}
 }

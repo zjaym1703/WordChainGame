@@ -90,6 +90,10 @@ class UserPanel extends JPanel{
 	public String getName() {
 		return name;
 	}
+	
+	public int getScore() {
+		return score;
+	}
 
 	public void setName(String name) {
 		this.name = name;
