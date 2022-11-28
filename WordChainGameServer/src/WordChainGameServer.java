@@ -259,7 +259,7 @@ public class WordChainGameServer extends JFrame {
 					for(int j=0;j<user_vc.size();j++) {
 						UserService u = (UserService)user_vc.elementAt(j);
 						if(userList[i].equals(u.UserName)) {
-							user.add(u);
+							user.add(u); 
 							break;
 						}
 					}
@@ -840,6 +840,7 @@ public class WordChainGameServer extends JFrame {
 						AppendText(msg);
 						String name = cm.UserName;
 						String type = cm.data;
+						roomNumber = cm.roomNumber;
 						
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
