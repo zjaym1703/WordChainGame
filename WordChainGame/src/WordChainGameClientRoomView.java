@@ -518,7 +518,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	}
 	
 	public void notifyGameEnd() {
-		ChatMsg obcm = new ChatMsg(UserName, "308", "GameEnd");
+		ChatMsg obcm = new ChatMsg(UserName, "400", "GameEnd");
 		obcm.SetRoomNumber(roomNumber);
 		waitingRoom.SendChatMsg(obcm);
 	}
