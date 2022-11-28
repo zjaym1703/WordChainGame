@@ -7,12 +7,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,7 +20,6 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 
 import javax.swing.JList;
@@ -43,18 +40,11 @@ public class WaitingRoom extends JFrame {
 	public WordChainGameClientRoomView gameRoomView;
 	public WaitingRoom waitingRoom;
 	private BGM bgm = null;
-//	private CreateRoom createRoom = null;
-//	private JFrame createRoomFrame = null; // 방 만들기 프레임
 	private JScrollPane userScrollPane, roomScrollPane;
 	private JList<String> userList, roomList;
 	
 	private JPanel contentPanel, roomlistPanel;
 	private JLabel roomL, usernameL;
-	
-	// 수정하고 있는 부분
-	private String [] header = { "번호", "방 제목", "인원", "게임 유형", "라운드 수", "라운드 시간" };
-	private Vector<String> row; // 행 추가 하는 부분
-	private DefaultTableModel model = new DefaultTableModel(header, 0); // header데이터로 컬럼 모델 생성
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -162,20 +152,6 @@ public class WaitingRoom extends JFrame {
 		revalidate();
 		repaint();
 		
-//		// 수정중인 부분
-//		JTable table = new JTable(model) {
-//			@Override
-//			public boolean isCellEditable(int row, int column) { // 수정 불가
-//				return false;
-//			}
-//		};
-//		roomScrollPane = new JScrollPane(table);
-//		roomScrollPane.setBounds(254, 48, 405, 582);
-//		roomScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-//		roomScrollPane.setViewportView(table);
-//		contentPanel.add(roomScrollPane);
-//		//
-		
 		try {
 			socket = new Socket(ip_addr, Integer.parseInt(port_no));
 			oos = new ObjectOutputStream(socket.getOutputStream());
@@ -205,7 +181,6 @@ public class WaitingRoom extends JFrame {
 //			panel.addMouseWheelListener(wheel);
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
-//			AppendText("connect error");
 		}
 	}
 	
@@ -247,16 +222,6 @@ public class WaitingRoom extends JFrame {
 							String [] title = cm.roomTitle.split(",");
 							roomList.setListData(title);
 						}
-//						//추가한 부분
-//						if (cm.roomTitle != null) { // 현재 만들어진 방 리스트에 뿌려주기
-//							String [] title = cm.roomTitle.split(",");
-//							for(int i=0; i < title.length; i++) {
-//								row = new Vector<String>();
-//								row.addElement(title[i]);
-//							}
-//							model.addRow(row);
-//						}
-//						//
 						break;
 					case "200":
 						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
@@ -338,7 +303,6 @@ public class WaitingRoom extends JFrame {
 						break;
 					}
 				} catch (IOException e) {
-//					AppendText("ois.readObject() error");
 					try {
 						ois.close();
 						oos.close();
@@ -370,9 +334,6 @@ public class WaitingRoom extends JFrame {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-
-			// textArea.append("�޼��� �۽� ����!!\n");
-			// System.exit(0);
 		}
 	}
 
@@ -383,17 +344,6 @@ public class WaitingRoom extends JFrame {
 			ChatMsg obcm = new ChatMsg(UserName, "302", "Create Room");
 			obcm.roomTitle = title;
 			SendObject(obcm);
-			
-			
-//			createRoom = new CreateRoom(createRoomFrame, waitingRoom);
-//            createRoomFrame = new JFrame();
-//            createRoomFrame.setTitle("방 생성");
-//            createRoomFrame.setContentPane(createRoom);
-//            createRoomFrame.setBounds(100, 200, 310, 255);
-//            createRoomFrame.setVisible(true);
-//            createRoomFrame.setLocationRelativeTo(null);
-//            createRoomFrame.setResizable(false);
-            
 		}
 	}
 
@@ -567,7 +517,6 @@ public class WaitingRoom extends JFrame {
 			ChatMsg obcm = new ChatMsg(UserName, "200", msg);
 			oos.writeObject(obcm);
 		} catch (IOException e) {
-//			AppendText("oos.writeObject() error");
 			try {
 				ois.close();
 				oos.close();

@@ -105,7 +105,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		this.UserName = userName; //// 개인 이름
 
 		initialize();
-
 		initListener();
 
 	}
@@ -115,8 +114,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		sendButton.addActionListener(action);
 		textInputField.addActionListener(action);
 		textInputField.requestFocus();
-		// ImageSendAction action2 = new ImageSendAction();
-		// imgBtn.addActionListener(action2);
 	}
 
 	/**
