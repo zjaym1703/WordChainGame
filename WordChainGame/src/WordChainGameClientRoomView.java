@@ -376,12 +376,14 @@ public class WordChainGameClientRoomView extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					start = true;
+					System.out.println(UserName+"방번호 : "+roomNumber);
 					ChatMsg obcm = new ChatMsg(UserName, "301", "Game started");
 					obcm.SetRoomNumber(roomNumber);
 					obcm.onStart = true;
 					waitingRoom.SendObject(obcm);
 					
 					ChatMsg obcm2 = new ChatMsg(UserName, "303", "Playing Game");
+					obcm2.SetRoomNumber(roomNumber);
 					waitingRoom.SendObject(obcm2);
 					
 					//Thread threadNum = new Thread(scoreLabel);
@@ -453,7 +455,8 @@ public class WordChainGameClientRoomView extends JFrame {
 							e.printStackTrace();
 						}	
 					}else {
-						//서버로 게임 종료 알리
+						//서버로 게임 종료 알리기
+						notifyGameExit();
 						break;
 					}
 				}
@@ -463,6 +466,12 @@ public class WordChainGameClientRoomView extends JFrame {
 		});
 		gameThread.start();
 		
+	}
+	
+	public void notifyGameExit() {
+//		ChatMsg obcm = new ChatMsg(UserName, "308", msg);
+//		obcm.SetRoomNumber(roomNumber);
+//		waitingRoom.SendChatMsg(obcm);
 	}
 	
 	// 타이머 스레드 실행시키는 함수
