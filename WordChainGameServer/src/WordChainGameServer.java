@@ -387,12 +387,27 @@ public class WordChainGameServer extends JFrame {
 			}
 		}
 		// 모든 User들에게 Object를 방송. 채팅 message와 image object를 보낼 수 있다
-		public void WriteAllObject(Object ob) {
-			for (int i = 0; i < user_vc.size(); i++) {
-				UserService user = (UserService) user_vc.elementAt(i);
-				if (user.UserStatus == "O")
-					user.WriteOneObject(ob);
-			}
+		public void WriteAllObject(Object ob, Room myRoom) {
+			String tmp = RoomInfo(myRoom);
+			if(myRoom.userList.contains("@")) {
+				String userlist = tmp.split("#")[8];
+				String [] users = userlist.split("@");
+							
+				for(int i = 0; i < user_vc.size(); i++) {
+					UserService user = (UserService) user_vc.elementAt(i);
+					for(int j = 0; j < users.length; j++) {
+						if(user.UserName.equals(users[j])) {
+							user.WriteOneObject(ob);
+						}
+					}
+				}
+			}		
+			
+//			for (int i = 0; i < user_vc.size(); i++) {
+//				UserService user = (UserService) user_vc.elementAt(i);
+//				if (user.UserStatus == "O")
+//					user.WriteOneObject(ob);
+//			}
 		}
 
 		// 나를 제외한 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
@@ -804,8 +819,14 @@ public class WordChainGameServer extends JFrame {
 								}
 							}
 						} else { // 일반 채팅 메시지
-							UserStatus = "O";
-							WriteAllObject(cm);
+							for (int i=0; i<RoomVec.size(); i++) {
+								Room room = RoomVec.get(i);
+								
+								if (room.roomNumber == cm.roomNumber) {
+									UserStatus = "O";
+									WriteAllObject(cm, room);
+								}
+							}
 						}
 					}else if(cm.code.matches("203")) { //답 입력 
 						msg = String.format("[%s] %s", cm.UserName, cm.data);
@@ -820,7 +841,7 @@ public class WordChainGameServer extends JFrame {
 									
 									if (room.roomNumber == cm.roomNumber) {
 										RoomUserListVec = getRoomUserList(roomNumber);
-										
+
 										int user_seq = RoomTurnList.get(roomNumber);
 										user_seq++;
 										if(user_seq == RoomUserListVec.size()) {
@@ -937,7 +958,7 @@ public class WordChainGameServer extends JFrame {
 						
 					}
 					else { // 300, 500, ... 기타 object는 모두 방송한다.
-						WriteAllObject(cm);
+//						WriteAllObject(cm);
 					} 
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");
