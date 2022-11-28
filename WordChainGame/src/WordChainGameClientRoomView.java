@@ -29,7 +29,6 @@ import java.awt.event.ActionEvent;
 public class WordChainGameClientRoomView extends JFrame {
 	private static final long serialVersionUID = 1L;
 
-	private final int second = 30;
 
 	private WaitingRoom waitingRoom;
 	private String data;
@@ -81,6 +80,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	public Thread threadNum;
 
 	public JLabel wordLabel;
+	public JLabel countLabel;
 	
 	boolean runFlag = true;
 
@@ -204,7 +204,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 
-		JLabel countLabel = new JLabel(roundTime + "초");
+		countLabel = new JLabel(roundTime + "초"); //300초 입력 게임 시작하면 바뀜 
 		countLabel.setBounds(643, 21, 38, 16);
 		contentPanel.add(countLabel);
 
@@ -240,6 +240,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		timerPanel.setBounds(611, 107, 70, 70);
 		timerPanel.setLayout(null);
 
+		int second =30;
 		timerLabel = new TimerLabel(second);
 		timerLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
 		timerLabel.setForeground(new Color(251, 255, 250));
@@ -436,13 +437,42 @@ public class WordChainGameClientRoomView extends JFrame {
 		peopleLabel.setText(roomCount + " / 6");
 	}
 	
+	public void gameTimerStart() {
+		Thread gameThread = new Thread(new Runnable() {
+
+			int gameTime = 300;
+			@Override
+			public void run() {
+				while(true) {
+					if(gameTime>0) {
+						gameTime-=1;
+						countLabel.setText(Integer.toString(gameTime)+"초");
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}	
+					}else {
+						//서버로 게임 종료 알리
+						break;
+					}
+				}
+				
+			}
+			
+		});
+		gameThread.start();
+		
+	}
+	
 	// 타이머 스레드 실행시키는 함수
 	public void startTimer() {
 		System.out.print("타이머 스레드 호출");
 		runFlag = true;
 
 		threadNum = new Thread(new Runnable() {
-
+			
 			int second = 30;
 			
 			@Override
@@ -458,13 +488,12 @@ public class WordChainGameClientRoomView extends JFrame {
 						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						Thread.interrupted();
+						return;
 					}
 				}	
 			}
 		});
 
-		System.out.println(threadNum.toString());
 		threadNum.start();
 	}
 	
@@ -472,7 +501,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	public void stopTimer() {
 		System.out.print("타이머 스레드 중지");
 		runFlag = false;
-		//threadNum.interrupt();
+		threadNum.interrupt();
 	}
 	
 	// 방에서 퇴장한 유저 삭제하는 함수
