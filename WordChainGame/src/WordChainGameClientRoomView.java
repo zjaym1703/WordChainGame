@@ -456,7 +456,7 @@ public class WordChainGameClientRoomView extends JFrame {
 						}	
 					}else {
 						//서버로 게임 종료 알리기
-						notifyGameExit();
+						notifyGameEnd();
 						break;
 					}
 				}
@@ -468,10 +468,10 @@ public class WordChainGameClientRoomView extends JFrame {
 		
 	}
 	
-	public void notifyGameExit() {
-//		ChatMsg obcm = new ChatMsg(UserName, "308", msg);
-//		obcm.SetRoomNumber(roomNumber);
-//		waitingRoom.SendChatMsg(obcm);
+	public void notifyGameEnd() {
+		ChatMsg obcm = new ChatMsg(UserName, "308", "GameEnd");
+		obcm.SetRoomNumber(roomNumber);
+		waitingRoom.SendChatMsg(obcm);
 	}
 	
 	// 타이머 스레드 실행시키는 함수

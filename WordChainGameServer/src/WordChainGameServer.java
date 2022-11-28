@@ -833,7 +833,12 @@ public class WordChainGameServer extends JFrame {
 						AlarmToTurn(roomNumber,u); 
 						sendTimeAll();
 						gameStartAll();
-					} else if (cm.code.matches("400")) { // logout message 처리
+					} else if (cm.code.matches("308")) { // 게임 종료 
+						// 게임 종료 시 1위만 보여줌 
+						// 데이터에 이름@점수 데이터만 전송 
+						
+						break;
+					}else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
 					} else if (cm.code.matches("401")) { // 유저 퇴장 처리
