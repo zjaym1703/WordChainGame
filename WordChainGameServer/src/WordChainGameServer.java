@@ -260,9 +260,8 @@ public class WordChainGameServer extends JFrame {
 			}
 			//test2
 			if(userList.length > 0) {
-				for(int i=0;i<user_vc.size();i++) {
-					System.out.print(userList[i]);
-					for(int j=0;j<userList.length;j++) {
+				for(int i=0;i<userList.length;i++) {
+					for(int j=0;j<user_vc.size();j++) {
 						UserService u = (UserService)user_vc.elementAt(j);
 						if(userList[i].equals(u.UserName)) {
 							user.add(u);
@@ -795,6 +794,7 @@ public class WordChainGameServer extends JFrame {
 						AppendText(msg);
 						
 						roomNumber = (int)cm.roomNumber;
+						
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
 						int user_seq = RoomTurnList.get(roomNumber);
@@ -857,6 +857,7 @@ public class WordChainGameServer extends JFrame {
 					} else if(cm.code.matches("303")) { //게임시작 
 						AppendText(msg);
 						roomNumber = (int)cm.roomNumber;
+						System.out.print("전달된 방번호"+roomNumber);
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
 						int user_seq = 0; //게임시작했을때 턴은 0으로 
@@ -866,7 +867,12 @@ public class WordChainGameServer extends JFrame {
 						AlarmToTurn(roomNumber,u); 
 						sendTimeAll();
 						gameStartAll();
-					} else if (cm.code.matches("400")) { // logout message 처리
+					} else if (cm.code.matches("308")) { // 게임 종료 
+						// 게임 종료 시 1위만 보여줌 
+						// 데이터에 이름@점수 데이터만 전송 
+						
+						break;
+					}else if (cm.code.matches("400")) { // logout message 처리
 						Logout();
 						break;
 					} else if (cm.code.matches("401")) { // 유저 퇴장 처리
