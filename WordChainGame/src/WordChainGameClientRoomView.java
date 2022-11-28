@@ -198,7 +198,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		roomNameLabel.setBounds(17, 21, 135, 16);
 		contentPanel.add(roomNameLabel);
 
-		peopleLabel = new JLabel(roomCount + " / 6");
+		peopleLabel = new JLabel(roomCount + " / 5");
 		peopleLabel.setBounds(545, 21, 86, 16);
 		contentPanel.add(peopleLabel);
 
@@ -445,7 +445,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			String roomNumber = data.split("#")[0]; // 방 번호 입력받아서
 			int roomNum = Integer.parseInt(roomNumber); // int형으로 바꿈
-			ChatMsg obcm = new ChatMsg(UserName, "401", "Exit Room");
+			ChatMsg obcm = new ChatMsg(UserName, "400", "Exit Room");
 			obcm.SetRoomNumber(roomNum);
 			waitingRoom.SendObject(obcm);
 			setVisible(false);
@@ -484,7 +484,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	public void settingRoomInfo(String list) {
 		String data[] = list.split("#");
 		roomCount = Integer.parseInt(data[3]);
-		peopleLabel.setText(roomCount + " / 6");
+		peopleLabel.setText(roomCount + " / 5");
 	}
 	
 	public void gameTimerStart() {

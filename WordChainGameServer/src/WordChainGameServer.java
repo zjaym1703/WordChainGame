@@ -474,7 +474,7 @@ public class WordChainGameServer extends JFrame {
 		
 		public void GameRoomExitAlarmOne(String userlist, String deleteUser) {
 			try {
-				ChatMsg r_ob = new ChatMsg(UserName, "401", userlist);
+				ChatMsg r_ob = new ChatMsg(UserName, "400", userlist);
 				r_ob.SetDeleteUser(deleteUser);
 				oos.writeObject(r_ob);
 			} catch (IOException e) {
@@ -543,7 +543,7 @@ public class WordChainGameServer extends JFrame {
 		public void GameExitAlarmOne(String type, String userName) {
 			try {
 				if(type.equals("One Exit")) {
-					ChatMsg r_ob = new ChatMsg(UserName, "401", userName);
+					ChatMsg r_ob = new ChatMsg(UserName, "400", userName);
 					oos.writeObject(r_ob);
 				} else {
 					ChatMsg r_ob = new ChatMsg(UserName, "402", userName);
@@ -954,15 +954,7 @@ public class WordChainGameServer extends JFrame {
 						AlarmToTurn(roomNumber, u, "first", cm.data); 
 						sendTimeAll();
 						gameStartAll();
-					} else if (cm.code.matches("308")) { // 게임 종료 
-						// 게임 종료 시 1위만 보여줌 
-						// 데이터에 이름@점수 데이터만 전송
-						
-						break;
-					}else if (cm.code.matches("400")) { // logout message 처리
-						Logout();
-						break;
-					} else if (cm.code.matches("401")) { // 유저 퇴장 처리
+					} else if (cm.code.matches("400")) { // 게임방 퇴장
 						for(int i=0;i<RoomVec.size();i++) {
 							Room room = RoomVec.get(i);
 							if(cm.roomNumber == room.roomNumber) {
@@ -976,6 +968,11 @@ public class WordChainGameServer extends JFrame {
 							}
 						}
 						
+					} else if (cm.code.matches("401")) { // 게임 종료
+						// 게임 종료 시 1위만 보여줌 
+						// 데이터에 이름@점수 데이터만 전송
+						
+						break;
 					}
 				} catch (IOException e) {
 					AppendText("ois.readObject() error");
