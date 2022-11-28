@@ -381,6 +381,7 @@ public class WordChainGameClientRoomView extends JFrame {
 					waitingRoom.SendObject(obcm);
 					
 					ChatMsg obcm2 = new ChatMsg(UserName, "303", "Playing Game");
+					obcm2.SetRoomNumber(roomNumber);
 					waitingRoom.SendObject(obcm2);
 					
 					//Thread threadNum = new Thread(scoreLabel);
