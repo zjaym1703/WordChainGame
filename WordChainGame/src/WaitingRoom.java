@@ -293,7 +293,7 @@ public class WaitingRoom extends JFrame {
 						
 						gameRoomView.gameTimerStart();
 						break;
-					case "304": //제시어 전달 받음 
+					case "304": // 제시어 전달 받음 
 						String word = (String)cm.data;
 						gameRoomView.wordLabel.setText(word);
 						gameRoomView.setCurrentQ(word);
