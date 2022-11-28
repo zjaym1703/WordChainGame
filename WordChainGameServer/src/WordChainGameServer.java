@@ -261,8 +261,6 @@ public class WordChainGameServer extends JFrame {
 			//test2
 			if(userList.length > 0) {
 				for(int i=0;i<userList.length;i++) {
-					System.out.println("userList"+userList[i]);
-					//for(int j=0;j<userList.length;j++) {
 					for(int j=0;j<user_vc.size();j++) {
 						UserService u = (UserService)user_vc.elementAt(j);
 						if(userList[i].equals(u.UserName)) {
@@ -684,6 +682,29 @@ public class WordChainGameServer extends JFrame {
 				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
 		}
+		
+		//이모티콘 전송
+		public void AlarmEmotion(String UserName, String type) {
+			String msg = UserName+"&"+type; //ex. User1&happy
+			System.out.println(msg);
+			try {
+				ChatMsg obcm = new ChatMsg("SERVER", "202", msg);
+				obcm.SetRoomNumber(roomNumber);
+				oos.writeObject(obcm);
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
+		}
 
 		public void run() {
 			while (true) { // 사용자 접속을 계속해서 받기 위해 while문
@@ -714,6 +735,7 @@ public class WordChainGameServer extends JFrame {
 						UserStatus = "O"; // Online 상태
 						EnterAlarmAll();
 						Login();
+
 					} else if (cm.code.matches("200")) {
 						msg = String.format("[%s] %s", cm.UserName, cm.data);
 						AppendText(msg); // server 화면에 출력
@@ -754,6 +776,18 @@ public class WordChainGameServer extends JFrame {
 						} else { // 일반 채팅 메시지
 							UserStatus = "O";
 							WriteAllObject(cm);
+						}
+					}else if(cm.code.matches("202")) { //이모티콘 전달받음 
+						msg = String.format("[%s] %s", cm.UserName, cm.data);
+						AppendText(msg);
+						String name = cm.UserName;
+						String type = cm.data;
+						
+						RoomUserListVec = getRoomUserList(roomNumber);
+						
+						for(int i=0;i<RoomUserListVec.size();i++) {
+							UserService u = (UserService) RoomUserListVec.elementAt(i);
+							u.AlarmEmotion(name,type);
 						}
 					}else if(cm.code.matches("203")) { //답 입력 
 						msg = String.format("[%s] %s", cm.UserName, cm.data);

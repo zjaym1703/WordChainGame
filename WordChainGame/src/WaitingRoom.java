@@ -267,7 +267,11 @@ public class WaitingRoom extends JFrame {
 							gameRoomView.AppendText(msg);
 						}
 						break;
-
+					case "202":
+						String nameType[] = cm.data.split("&");
+						System.out.println("name"+nameType[0]+"type"+nameType[1]);
+						gameRoomView.setEmoticonPanel(nameType[0], nameType[1]);
+						break;
 					case "203": // 답 입력 성공 여부 받
 						break;
 
