@@ -401,13 +401,7 @@ public class WordChainGameServer extends JFrame {
 						}
 					}
 				}
-			}		
-			
-//			for (int i = 0; i < user_vc.size(); i++) {
-//				UserService user = (UserService) user_vc.elementAt(i);
-//				if (user.UserStatus == "O")
-//					user.WriteOneObject(ob);
-//			}
+			}
 		}
 
 		// 나를 제외한 User들에게 방송. 각각의 UserService Thread의 WriteONe() 을 호출한다.
@@ -832,57 +826,52 @@ public class WordChainGameServer extends JFrame {
 						msg = String.format("[%s] %s", cm.UserName, cm.data);
 						AppendText(msg);
 						
-						// 제시어의 마지막 단어와 사용자가 입력한 첫번째 단어 비교
+						for(int i = 0; i < RoomVec.size(); i++) {
+							Room room = RoomVec.get(i);
+							if(room.roomNumber == cm.roomNumber) { // 일치하는 방 찾기
+								myRoom = room;  // 들어간 방 설정
+								break;
+							}
+						}
+						
 						if (cm.currentQ.charAt(cm.currentQ.length() - 1) == cm.data.charAt(0)) {
 							boolean compareWord = words.compareWord(cm.data);
 							if (compareWord) { // 정답일 때
-								for (int i = 0; i < RoomVec.size(); i++) {
-									Room room = RoomVec.get(i);
-									
-									if (room.roomNumber == cm.roomNumber) {
-										RoomUserListVec = getRoomUserList(roomNumber);
+								RoomUserListVec = getRoomUserList(cm.roomNumber);
 
-										int user_seq = RoomTurnList.get(roomNumber);
-										user_seq++;
-										if(user_seq == RoomUserListVec.size()) {
-											user_seq = 0; //초기화 
-										}
-										
-										RoomTurnList.put(roomNumber, user_seq); //방마다 턴을 저장함 
-									
-										UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
-										//u.setTurn(false);
-										
-										AlarmToTurn(roomNumber, u, "not first", cm.data); // 턴 전송
-										sendTimeAll();
-										ScoreAlarm(room, cm.UserName, "correct"); // 정답을 맞출 때마다 점수 오르는 방송
-									}
+								int user_seq = RoomTurnList.get(cm.roomNumber);
+								user_seq++;
+								if(user_seq == RoomUserListVec.size()) {
+									user_seq = 0; //초기화 
 								}
-							} else { // wordList에 없는 단어를 입력했을 때
-								for (int i = 0; i < RoomVec.size(); i++) {
-									Room room = RoomVec.get(i);
+								
+								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
+							
+								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
+								//u.setTurn(false);
+								
+								AlarmToTurn(cm.roomNumber, u, "not first", cm.data); // 턴 전송
+								sendTimeAll();
+								ScoreAlarm(myRoom, cm.UserName, "correct"); // 정답을 맞출 때마다 점수 오르는 방송
+							}
+							else { // wordList에 없는 단어를 입력했을 때
+								RoomUserListVec = getRoomUserList(cm.roomNumber);
 									
-									if (room.roomNumber == cm.roomNumber) {
-										RoomUserListVec = getRoomUserList(roomNumber);
-									
-										int user_seq = RoomTurnList.get(roomNumber);
-										user_seq++;
-										if(user_seq == RoomUserListVec.size()) {
-											user_seq = 0; //초기화 
-										}
-										
-										RoomTurnList.put(roomNumber, user_seq); //방마다 턴을 저장함 
-									
-										UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
-										//u.setTurn(false);
-										AlarmToTurn(roomNumber, u, "not first", cm.currentQ); // 턴 전송
-										sendTimeAll();
-										ScoreAlarm(room, cm.UserName, "wrong");
-									}
+								int user_seq = RoomTurnList.get(cm.roomNumber);
+								user_seq++;
+								if(user_seq == RoomUserListVec.size()) {
+									user_seq = 0; //초기화 
 								}
+										
+								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
+									
+								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
+								//u.setTurn(false);
+								AlarmToTurn(cm.roomNumber, u, "not first", cm.currentQ); // 턴 전송
+								sendTimeAll();
+								ScoreAlarm(myRoom, cm.UserName, "wrong");
 							}
 						}
-					
 
 					}else if(cm.code.matches("301")) { // 방 입장
 						for(int i = 0; i < RoomVec.size(); i++) {
