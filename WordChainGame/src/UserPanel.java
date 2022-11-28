@@ -61,6 +61,13 @@ class UserPanel extends JPanel{
 		add(emoticonLabel);
 		
 	}
+	
+	ImageIcon imageSetSize(ImageIcon icon, int i, int j) { // image Size Setting
+		Image ximg = icon.getImage(); // ImageIcon을 Image로 변환.
+		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
+		ImageIcon xyimg = new ImageIcon(yimg);
+		return xyimg;
+	}
 
 	
 	public void setEmoticonStatus(String status) {
@@ -68,18 +75,23 @@ class UserPanel extends JPanel{
 		
 		switch(status) {
 			case "happy": 
+				happyEmo = imageSetSize(happyEmo, 30, 30);
 				emoticonLabel.setIcon(happyEmo);
 				return;
 			case "love":
+				loveEmo = imageSetSize(loveEmo, 30, 30);
 				emoticonLabel.setIcon(loveEmo);
 				return;
 			case "suprise":
+				supriseEmo = imageSetSize(supriseEmo, 30, 30);
 				emoticonLabel.setIcon(supriseEmo);
 				return;
 			case "sleep":
+				sleepEmo = imageSetSize(sleepEmo, 30, 30);
 				emoticonLabel.setIcon(sleepEmo);
 				return;
 			case "angry":
+				AngryEmo = imageSetSize(AngryEmo, 30, 30);
 				emoticonLabel.setIcon(AngryEmo);
 				return;
 		}

@@ -268,6 +268,13 @@ public class WordChainGameClientRoomView extends JFrame {
 				happyemoButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+		
+		happyemoButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendEmoticon("happy");
+				
+		}});
 		contentPanel.add(happyemoButton);
 
 		loveEmo = imageSetSize(loveEmo, 30, 30);
@@ -288,6 +295,13 @@ public class WordChainGameClientRoomView extends JFrame {
 				loveButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+		
+		loveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendEmoticon("love");
+				
+		}});
 		contentPanel.add(loveButton);
 
 		supriseEmo = imageSetSize(supriseEmo, 30, 30);
@@ -309,6 +323,12 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		});
 
+		supriseButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendEmoticon("suprise");
+				
+		}});
 		contentPanel.add(supriseButton);
 
 		sleepEmo = imageSetSize(sleepEmo, 30, 30);
@@ -329,6 +349,13 @@ public class WordChainGameClientRoomView extends JFrame {
 				sleepeButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+		
+		sleepeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendEmoticon("sleep");
+				
+		}});
 		contentPanel.add(sleepeButton);
 
 		AngryEmo = imageSetSize(AngryEmo, 30, 30);
@@ -349,6 +376,12 @@ public class WordChainGameClientRoomView extends JFrame {
 				angryButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
+		angryButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendEmoticon("angry");
+				
+		}});
 		contentPanel.add(angryButton);
 
 		gameStartButtonEnteredImage = imageSetSize(gameStartButtonEnteredImage, 65, 50);
@@ -428,6 +461,24 @@ public class WordChainGameClientRoomView extends JFrame {
 		Image yimg = ximg.getScaledInstance(i, j, java.awt.Image.SCALE_SMOOTH);
 		ImageIcon xyimg = new ImageIcon(yimg);
 		return xyimg;
+	}
+	
+	//이모티콘 전송
+	public void sendEmoticon(String type) {
+		ChatMsg obcm = new ChatMsg(UserName, "202", type);
+		obcm.SetRoomNumber(roomNumber);
+		waitingRoom.SendObject(obcm);
+	}
+	
+	//패널에 이모티콘 추가
+	public void setEmoticonPanel(String UserName,String type) {
+		for(UserPanel p : UserPanelList) {
+			if(p.getName().equals(UserName)) {
+				p.setEmoticonStatus(type);
+			}
+		}
+		contentPanel.revalidate();
+		contentPanel.repaint();
 	}
 	
 	// 방의 정보 동기화
