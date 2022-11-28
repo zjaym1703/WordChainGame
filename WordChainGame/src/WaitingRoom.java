@@ -273,6 +273,10 @@ public class WaitingRoom extends JFrame {
 						gameRoomView.setEmoticonPanel(nameType[0], nameType[1]);
 						break;
 					case "203": // 답 입력 성공 여부 받
+						if (cm.data.equals("correct"))
+							gameRoomView.plusScore(cm.answerUsername);
+						else if (cm.data.equals("wrong"))
+							gameRoomView.minusScore(cm.answerUsername);
 						break;
 
 					case "301": // 방 입장하는 부분
@@ -293,9 +297,10 @@ public class WaitingRoom extends JFrame {
 						
 						gameRoomView.gameTimerStart();
 						break;
-					case "304": //제시어 전달 받음 
+					case "304": // 제시어 전달 받음 
 						String word = (String)cm.data;
 						gameRoomView.wordLabel.setText(word);
+						gameRoomView.setCurrentQ(word);
 						break;
 					case "306": // 턴 입력 받음 
 						String turnMember = cm.data;

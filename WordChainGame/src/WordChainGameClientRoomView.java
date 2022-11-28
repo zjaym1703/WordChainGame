@@ -42,6 +42,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	private int roundTime; // 라운드 시간
 	private int roundCount; // 라운드 수
 	private boolean start; // 게임 시작 여부
+	private String currentQ;
 
 	private int turnNumber = 0;
 	private Vector<UserDTO> user;
@@ -240,7 +241,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		timerPanel.setBounds(611, 107, 70, 70);
 		timerPanel.setLayout(null);
 
-		int second =30;
+		int second = 30;
 		timerLabel = new TimerLabel(second);
 		timerLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
 		timerLabel.setForeground(new Color(251, 255, 250));
@@ -563,6 +564,28 @@ public class WordChainGameClientRoomView extends JFrame {
 		threadNum.interrupt();
 	}
 	
+	// 정답을 맞출때마다 점수 오르는 함수
+	public void plusScore(String userName) {
+		UserPanel u = null;
+		for (int i = 0; i < UserPanelList.size(); i++) {
+			u = (UserPanel) UserPanelList.elementAt(i);
+			if (u.getName().equals(userName)) {
+				u.setScore(u.getScore() + 10);
+			}
+		}
+	}
+	
+	// 정답을 틀릴때마다 점수 내리는 함수
+	public void minusScore(String userName) {
+		UserPanel u = null;
+		for (int i = 0; i < UserPanelList.size(); i++) {
+			u = (UserPanel) UserPanelList.elementAt(i);
+			if (u.getName().equals(userName)) {
+				u.setScore(u.getScore() - 10);
+			}
+		}
+	}
+	
 	// 방에서 퇴장한 유저 삭제하는 함수
 	public void deleteUser(String deleteUser, String list) {
 		String userList[] = list.split("@"); // 나가고 남은 사람들 리스트
@@ -670,6 +693,10 @@ public class WordChainGameClientRoomView extends JFrame {
 			}
 		}
 	}
+	
+	public void setCurrentQ(String currentQ) {
+		this.currentQ = currentQ;
+	}
 
 	// 턴 변경
 	public void setTurnUser(String userName) {
@@ -696,8 +723,9 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	// Server에게 network으로 답 전송
 	public void SendAnswerMessage(String msg) {
-		ChatMsg obcm = new ChatMsg(waitingRoom.UserName, "203", msg);
+		ChatMsg obcm = new ChatMsg(UserName, "203", msg);
 		obcm.SetRoomNumber(roomNumber);
+		obcm.SetCurrentQ(currentQ);
 		waitingRoom.SendChatMsg(obcm);
 	}
 
