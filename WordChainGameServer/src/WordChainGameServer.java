@@ -1020,7 +1020,6 @@ public class WordChainGameServer extends JFrame {
 						AlarmToTurn(roomNumber, u, "first", cm.data); 
 						sendTimeAll();
 						gameStartAll();
-						
 					} else if(cm.code.matches("305")) { //사용자 점수 관리 
 						String name = cm.data.split("&")[0];
 						int score = Integer.parseInt(cm.data.split("&")[1]);
@@ -1035,7 +1034,6 @@ public class WordChainGameServer extends JFrame {
 								u.UserScore = score;
 							}
 						}
-						
 					} else if (cm.code.matches("400")) { // 게임방 퇴장
 						for(int i=0;i<RoomVec.size();i++) {
 							Room room = RoomVec.get(i);
@@ -1053,6 +1051,7 @@ public class WordChainGameServer extends JFrame {
 					} else if (cm.code.matches("401")) { // 게임 종료
 						// 게임 종료 시 1위만 보여줌 
 						// 데이터에 이름@점수 데이터만 전송
+
 						roomNumber =cm.roomNumber;
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
