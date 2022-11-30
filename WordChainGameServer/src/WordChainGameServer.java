@@ -782,17 +782,25 @@ public class WordChainGameServer extends JFrame {
 		
 		//게임방의 1등 구하는 함수
 		public String getFirstWinUser(int roomNumber) {
+			
+			RoomUserListVec = getRoomUserList(roomNumber);
+			
 			String msg = "";
 		
+			int[] score = new int[RoomUserListVec.size()];
+			for(int i=0;i<score.length;i++) {
+				UserService u = (UserService) RoomUserListVec.elementAt(i);
+				score[i] = u.UserScore;
+			}
+			
 			int[] rank = new int[RoomUserListVec.size()];
 			Arrays.fill(rank, 1); //배열 원소를 1로 초기화 
 			
-			for(int i=1;i<RoomUserListVec.size();i++) {
-				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
-				for(int j=0;j<RoomUserListVec.size();j++) {
-					UserService u2 = (UserService) RoomUserListVec.elementAt(j);
-					if(u1.UserScore < u2.UserScore) {
-						rank[i]++;
+			for(int i=1;i<score.length;i++) {
+				rank[i] = 1;
+				for(int j=0;j<score.length;j++) {
+					if(score[j] > score[i]) {
+						rank[i] = rank[i]+1;
 					}
 				}
 			}

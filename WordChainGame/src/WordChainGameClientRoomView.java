@@ -1,5 +1,8 @@
 import java.awt.Graphics;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,6 +28,7 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.awt.event.ActionEvent;
 
 public class WordChainGameClientRoomView extends JFrame {
@@ -678,6 +682,33 @@ public class WordChainGameClientRoomView extends JFrame {
 		textArea.setCharacterAttributes(aset, false);
 		textArea.replaceSelection(msg + "\n");
 
+	}
+	
+	//오디오
+	public void correctAudio() {
+		File file = new File("bgm/correctSound.wav");
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(file));
+			clip.loop(1);
+            clip.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void failAudio() {
+		File file = new File("bgm/correctSound.wav");
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(file));
+			clip.loop(1);
+            clip.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// keyboard enter key 치면 서버로 전송
