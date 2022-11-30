@@ -17,6 +17,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -490,7 +491,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	public void gameTimerStart() {
 		Thread gameThread = new Thread(new Runnable() {
 
-			int gameTime = 300;
+			int gameTime = 30;
 			@Override
 			public void run() {
 				while(true) {
@@ -518,7 +519,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	}
 	
 	public void notifyGameEnd() {
-		ChatMsg obcm = new ChatMsg(UserName, "400", "GameEnd");
+		ChatMsg obcm = new ChatMsg(UserName, "401", "GameEnd");
 		obcm.SetRoomNumber(roomNumber);
 		waitingRoom.SendChatMsg(obcm);
 	}
@@ -564,23 +565,38 @@ public class WordChainGameClientRoomView extends JFrame {
 	// 정답을 맞출때마다 점수 오르는 함수
 	public void plusScore(String userName) {
 		UserPanel u = null;
+		String score = "";
 		for (int i = 0; i < UserPanelList.size(); i++) {
 			u = (UserPanel) UserPanelList.elementAt(i);
 			if (u.getName().equals(userName)) {
 				u.setScore(u.getScore() + 10);
+				score = String.valueOf(u.getScore());
 			}
 		}
+		sendUserScore(userName,score);
 	}
 	
 	// 정답을 틀릴때마다 점수 내리는 함수
 	public void minusScore(String userName) {
 		UserPanel u = null;
+		String score = "";
 		for (int i = 0; i < UserPanelList.size(); i++) {
 			u = (UserPanel) UserPanelList.elementAt(i);
 			if (u.getName().equals(userName)) {
 				u.setScore(u.getScore() - 10);
+				score = String.valueOf(u.getScore());
 			}
 		}
+		sendUserScore(userName,score);
+	}
+	
+	//서버로 점수 동기화 하는 함수
+	public void sendUserScore(String userName,String score) {
+		String msg = userName+"&"+score;
+		
+		ChatMsg obcm = new ChatMsg(UserName, "305", msg);
+		obcm.SetRoomNumber(roomNumber);
+		waitingRoom.SendChatMsg(obcm);
 	}
 	
 	// 방에서 퇴장한 유저 삭제하는 함수
@@ -709,6 +725,13 @@ public class WordChainGameClientRoomView extends JFrame {
 			revalidate();
 			repaint();
 		}
+	}
+	
+	//게임종료 alert 띄우기
+	public void showgameEndDialog(String name,String score) {
+		System.out.println("client: "+name+" "+score);
+		String msg = name+"님이 우승했습니다!!\n\n"+score+"점";
+		JOptionPane.showMessageDialog(contentPanel, msg,"게임종료", JOptionPane.INFORMATION_MESSAGE, null);
 	}
 
 	// Server에게 network으로 전송

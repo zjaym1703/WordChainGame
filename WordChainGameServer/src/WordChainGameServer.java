@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Vector;
@@ -659,6 +660,27 @@ public class WordChainGameServer extends JFrame {
 				u.sendWord(word);
 			}
 		}
+		
+		//결과 전송 
+		public void sendResult(String msg) {
+			try {
+				ChatMsg obcm = new ChatMsg("SERVER", "401", msg);
+				oos.writeObject(obcm);
+			} catch (IOException e) {
+				AppendText("dos.writeObject() error");
+				try {
+					ois.close();
+					oos.close();
+					client_socket.close();
+					client_socket = null;
+					ois = null;
+					oos = null;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
+			}
+		}
 		public void sendWord(String word) {
 			try {
 				ChatMsg obcm = new ChatMsg(UserName, "304", word);
@@ -756,6 +778,49 @@ public class WordChainGameServer extends JFrame {
 				}
 				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
+		}
+		
+		//게임방의 1등 구하는 함수
+		public String getFirstWinUser(int roomNumber) {
+			String msg = "";
+		
+			int[] rank = new int[RoomUserListVec.size()];
+			Arrays.fill(rank, 1); //배열 원소를 1로 초기화 
+			
+			for(int i=1;i<RoomUserListVec.size();i++) {
+				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
+				for(int j=0;j<RoomUserListVec.size();j++) {
+					UserService u2 = (UserService) RoomUserListVec.elementAt(j);
+					if(u1.UserScore < u2.UserScore) {
+						rank[i]++;
+					}
+				}
+			}
+			
+			int rankFlag = 0; //무승부를 체크 하는 값 
+			for(int i=0;i<RoomUserListVec.size();i++) {
+				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
+				if(rank[i] == 1) {
+					rankFlag++;
+					if(rankFlag == 1) {
+						msg =u1.UserScore +"&"+u1.UserName;
+					}else {
+						msg+="@"+u1.UserName;
+					}
+					
+				}
+			}
+			System.out.println("list data :"+msg);
+
+//			for(int i=1;i<RoomUserListVec.size();i++) {
+//				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
+//				if(u1.UserScore > firstWinScore) {
+//					firstWinScore = u1.UserScore;
+//					firstWinUser = u1.UserName;
+//				}
+//			}
+			
+			return msg;
 		}
 
 		public void run() {
@@ -955,6 +1020,20 @@ public class WordChainGameServer extends JFrame {
 						AlarmToTurn(roomNumber, u, "first", cm.data); 
 						sendTimeAll();
 						gameStartAll();
+					} else if(cm.code.matches("305")) { //사용자 점수 관리 
+						String name = cm.data.split("&")[0];
+						int score = Integer.parseInt(cm.data.split("&")[1]);
+						
+						roomNumber = (int)cm.roomNumber;
+						RoomUserListVec = getRoomUserList(roomNumber);
+						
+						for(int i=0;i<RoomUserListVec.size();i++) {
+							UserService u = (UserService)RoomUserListVec.elementAt(i);
+							if(u.UserName.equals(name)) {
+								System.out.println(name+" "+score);
+								u.UserScore = score;
+							}
+						}
 					} else if (cm.code.matches("400")) { // 게임방 퇴장
 						for(int i=0;i<RoomVec.size();i++) {
 							Room room = RoomVec.get(i);
@@ -972,6 +1051,14 @@ public class WordChainGameServer extends JFrame {
 					} else if (cm.code.matches("401")) { // 게임 종료
 						// 게임 종료 시 1위만 보여줌 
 						// 데이터에 이름@점수 데이터만 전송
+
+						roomNumber =cm.roomNumber;
+						RoomUserListVec = getRoomUserList(roomNumber);
+						
+						msg = getFirstWinUser(roomNumber); //사용자명&점수
+						
+						//게임방 없앰
+						sendResult(msg);
 						
 						break;
 					}

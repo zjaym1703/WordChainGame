@@ -301,6 +301,18 @@ public class WaitingRoom extends JFrame {
 							gameRoomView.deleteUser(cm.deleteUser, cm.data);
 						}
 						break;
+					case "401": //게임종료 
+						String score = cm.data.split("&")[0];
+						String name[] = cm.data.split("&")[1].split("@");
+						
+						String namelist = "";
+						for(int i=0;i<name.length;i++) {
+							namelist+=name[i]+", ";
+						}
+						namelist = namelist.substring(0, namelist.length() - 2); //마지막 ", " 문자 제거 
+						
+						gameRoomView.showgameEndDialog(namelist,score);
+						break;
 					}
 				} catch (IOException e) {
 					try {
