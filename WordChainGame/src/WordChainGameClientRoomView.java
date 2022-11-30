@@ -699,7 +699,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	}
 	
 	public void failAudio() {
-		File file = new File("bgm/correctSound.wav");
+		File file = new File("bgm/failSound.wav");
 		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
