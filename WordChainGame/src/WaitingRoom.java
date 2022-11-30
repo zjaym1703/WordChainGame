@@ -238,10 +238,13 @@ public class WaitingRoom extends JFrame {
 						gameRoomView.setEmoticonPanel(nameType[0], nameType[1]);
 						break;
 					case "203": // 답 입력 성공 여부 받
-						if (cm.data.equals("correct"))
+						if (cm.data.equals("correct")) {
 							gameRoomView.plusScore(cm.answerUsername);
-						else if (cm.data.equals("wrong"))
+							gameRoomView.correctAudio();
+						}else if (cm.data.equals("wrong")) {
 							gameRoomView.minusScore(cm.answerUsername);
+							gameRoomView.failAudio();
+						}
 						break;
 
 					case "301": // 방 입장하는 부분
@@ -309,8 +312,9 @@ public class WaitingRoom extends JFrame {
 						for(int i=0;i<name.length;i++) {
 							namelist+=name[i]+", ";
 						}
-						namelist = namelist.substring(0, namelist.length() - 2); //마지막 ", " 문자 제거 
+						namelist = namelist.substring(0, namelist.length() - 2); //마지막 ", " 문자 제거
 						
+						gameRoomView.stopTimer(); //기존 timer stop
 						gameRoomView.showgameEndDialog(namelist,score);
 						break;
 					}
