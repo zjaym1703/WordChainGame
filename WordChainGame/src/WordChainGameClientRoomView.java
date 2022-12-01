@@ -491,7 +491,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	public void gameTimerStart() {
 		Thread gameThread = new Thread(new Runnable() {
 
-			int gameTime = 30;
+			int gameTime = 100;
 			@Override
 			public void run() {
 				while(true) {
@@ -531,7 +531,7 @@ public class WordChainGameClientRoomView extends JFrame {
 
 		threadNum = new Thread(new Runnable() {
 			
-			int second = 30;
+			int second = 20;
 			
 			@Override
 			public void run() {
@@ -541,11 +541,18 @@ public class WordChainGameClientRoomView extends JFrame {
 							second -= 1;
 							timerLabel.setText(Integer.toString(second));
 							Thread.sleep(1000);		
-						}else {
+						} else if (second == 0) {
+							if (waitingRoom.isTurn) {
+								ChatMsg obcm = new ChatMsg(UserName, "203", "over");
+								obcm.SetRoomNumber(roomNumber);
+								obcm.SetCurrentQ(currentQ);
+								waitingRoom.SendObject(obcm);
+							}
+							break;
+						} else {
 							break;
 						}
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						return;
 					}
 				}	
