@@ -921,7 +921,7 @@ public class WordChainGameServer extends JFrame {
 							UserService u = (UserService) RoomUserListVec.elementAt(i);
 							u.AlarmEmotion(name,type);
 						}
-					}else if(cm.code.matches("203")) { //답 입력 
+					}else if(cm.code.matches("203")) { // 답 입력 
 						msg = String.format("[%s] %s", cm.UserName, cm.data);
 						AppendText(msg);
 						
@@ -933,7 +933,7 @@ public class WordChainGameServer extends JFrame {
 							}
 						}
 						
-						if (cm.currentQ.charAt(cm.currentQ.length() - 1) == cm.data.charAt(0)) {
+						if ((cm.currentQ.charAt(cm.currentQ.length() - 1) == cm.data.charAt(0)) || cm.data.equals("over")) {
 							boolean compareWord = words.compareWord(cm.data);
 							if (compareWord) { // 정답일 때
 								RoomUserListVec = getRoomUserList(cm.roomNumber);
