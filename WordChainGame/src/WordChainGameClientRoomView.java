@@ -437,6 +437,10 @@ public class WordChainGameClientRoomView extends JFrame {
 		UserListPanel.setBackground(new Color(0, 0, 0, 0));
 
 		contentPanel.add(UserListPanel);
+		
+		JLabel gameModeLabel = new JLabel("New label");
+		gameModeLabel.setBounds(17, 62, 96, 16);
+		contentPanel.add(gameModeLabel);
 
 		RoomExitCreateAction roomExitCreateAction = new RoomExitCreateAction();
 		exitButton.addActionListener(roomExitCreateAction);
@@ -646,7 +650,14 @@ public class WordChainGameClientRoomView extends JFrame {
 			UserPanel user = new UserPanel(userPanelX, userPanelY);
 			user.setName(list.get(i).getName());
 			user.setScore(list.get(i).getScore());
-
+			user.addMouseListener(new MouseAdapter() {
+			 @Override
+			    public void mouseClicked(MouseEvent e) {
+				 	//나는 클릭 못하도록 하기 
+				 	textInputField.setText("[귓속말] "+user.getName()+" ");
+			    }
+			});
+			
 			UserListPanel.add(user);
 			UserPanelList.add(user); // 외부에서 패널 접근하기 위한 함
 			userPanelX += user.width + 5;
@@ -655,6 +666,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		contentPanel.revalidate();
 		contentPanel.repaint();
 	}
+
 
 	// 화면에 출력
 	public void AppendText(String msg) {
@@ -767,9 +779,16 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	// Server에게 network으로 전송
 	public void SendMessage(String msg) {
-		ChatMsg obcm = new ChatMsg(UserName, "200", msg);
-		obcm.SetRoomNumber(roomNumber);
-		waitingRoom.SendChatMsg(obcm);
+		if(msg.contains("[귓속말]")) { // 귓속말 - 귓속말 user1 메시지
+			ChatMsg obcm = new ChatMsg(UserName, "201", msg);
+			obcm.SetRoomNumber(roomNumber);
+			waitingRoom.SendChatMsg(obcm);
+		}else { // 채팅
+			ChatMsg obcm = new ChatMsg(UserName, "200", msg);
+			obcm.SetRoomNumber(roomNumber);
+			waitingRoom.SendChatMsg(obcm);
+		}
+		
 	}
 
 	// Server에게 network으로 답 전송
@@ -791,5 +810,4 @@ public class WordChainGameClientRoomView extends JFrame {
 			this.second = second;
 		}
 	}
-	
 }

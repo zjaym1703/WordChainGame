@@ -154,6 +154,7 @@ public class WordChainGameServer extends JFrame {
 		private Vector user_vc;
 		public String UserName = "";
 		public String UserStatus;
+		public String UserMode; // 게임참여 or 관전모드 를 받기 위한 변수 
 		public int UserScore = 0;
 		public boolean isTurn = false;
 		public int roomNumber = 0;
@@ -611,7 +612,7 @@ public class WordChainGameServer extends JFrame {
 		// 귓속말 전송
 		public void WritePrivate(String msg) {
 			try {
-				ChatMsg obcm = new ChatMsg("귓속말", "200", msg);
+				ChatMsg obcm = new ChatMsg("귓속말", "201", msg);
 				oos.writeObject(obcm);
 			} catch (IOException e) {
 				AppendText("dos.writeObject() error");
@@ -884,20 +885,7 @@ public class WordChainGameServer extends JFrame {
 						} else if (args[1].matches("/wakeup")) {
 							UserStatus = "O";
 						} else if (args[1].matches("/to")) { // 귓속말
-							for (int i = 0; i < user_vc.size(); i++) {
-								UserService user = (UserService) user_vc.elementAt(i);
-								if (user.UserName.matches(args[2]) && user.UserStatus.matches("O")) {
-									String msg2 = "";
-									for (int j = 3; j < args.length; j++) {// 실제 message 부분
-										msg2 += args[j];
-										if (j < args.length - 1)
-											msg2 += " ";
-									}
-									// /to 빼고.. [귓속말] [user1] Hello user2..
-									user.WritePrivate(args[0] + " " + msg2 + "\n");
-									break;
-								}
-							}
+							
 						} else { // 일반 채팅 메시지
 							for (int i=0; i<RoomVec.size(); i++) {
 								Room room = RoomVec.get(i);
@@ -906,6 +894,27 @@ public class WordChainGameServer extends JFrame {
 									UserStatus = "O";
 									WriteAllObject(cm, room);
 								}
+							}
+						}
+					}else if(cm.code.matches("201")) { //귓속말 
+						msg = String.format("[%s] %s", cm.UserName, cm.data);
+						AppendText(msg); // server 화면에 출력
+						String[] args = msg.split(" "); // 단어들을 분리한다.
+						
+						System.out.println(args[2]+" ");
+						
+						for (int i = 0; i < user_vc.size(); i++) {
+							UserService user = (UserService) user_vc.elementAt(i);
+							if (user.UserName.matches(args[2]) && user.UserStatus.matches("O")) {
+								String msg2 = "";
+								for (int j = 3; j < args.length; j++) {// 실제 message 부분
+									msg2 += args[j];
+									if (j < args.length - 1)
+										msg2 += " ";
+								}
+								// /to 빼고.. [귓속말] [user1] Hello user2..
+								user.WritePrivate(args[0] + " " + msg2 + "\n");
+								break;
 							}
 						}
 					}else if(cm.code.matches("202")) { //이모티콘 전달받음 
@@ -969,6 +978,7 @@ public class WordChainGameServer extends JFrame {
 								AlarmToTurn(cm.roomNumber, u, "not first", cm.currentQ); // 턴 전송
 								sendTimeAll();
 								ScoreAlarm(myRoom, cm.UserName, "wrong");
+								
 							}
 						}
 

@@ -232,6 +232,10 @@ public class WaitingRoom extends JFrame {
 							gameRoomView.AppendText(msg);
 						}
 						break;
+					case "201":
+						msg = String.format("[%s] %s\n", cm.UserName, cm.data);
+						gameRoomView.AppendTextColor(msg,Color.BLUE);
+						break;
 					case "202":
 						String nameType[] = cm.data.split("&");
 						System.out.println("name"+nameType[0]+"type"+nameType[1]);
