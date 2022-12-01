@@ -2,7 +2,6 @@ import java.awt.Graphics;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -119,7 +118,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	}
 
 	private void initListener() {
-		if(mode.equals("")) {
+		if(mode.equals("watch")) {
 			textInputField.setEditable(false);
 		}else {
 			TextSendAction action = new TextSendAction();
