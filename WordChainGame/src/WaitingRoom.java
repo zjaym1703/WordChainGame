@@ -45,6 +45,8 @@ public class WaitingRoom extends JFrame {
 	
 	private JPanel contentPanel, roomlistPanel;
 	private JLabel roomL, usernameL;
+	
+	private String mode = "";
 
 	private ImageIcon screenImage = new ImageIcon("images/waitingBackground.png");
 	private Image introBackground = screenImage.getImage();
@@ -53,6 +55,14 @@ public class WaitingRoom extends JFrame {
 	private ImageIcon startButtonBasicImage = new ImageIcon("images/startButtonBasic.png");
 	private JButton startButton = new JButton(startButtonBasicImage);
 	private ImageIcon startButtonEnteredImage = new ImageIcon("images/startButtonEntered.png");
+	
+	public void selectedMode(String mode) {
+		this.mode = mode;
+	}
+	
+	public String getMode() {
+		return this.mode;
+	}
 	
 	public WaitingRoom(String userName, String ip_addr, String port_no)  {
 		this.UserName = userName;
@@ -142,6 +152,9 @@ public class WaitingRoom extends JFrame {
 				JList list = (JList) e.getSource();
 				if(e.getClickCount() == 2) {
 					int index = list.locationToIndex(e.getPoint());
+					//창 띄워주기
+					//WordChainGameModeSelectedDialog dialog = new WordChainGameModeSelectedDialog(waitingRoom,index,UserName);
+					//dialog.setVisible(true);
 					ChatMsg obcm = new ChatMsg(UserName, "301", UserName + " enter GameRoom");
 					obcm.SetRoomNumber(index);
 					SendObject(obcm);
@@ -254,7 +267,7 @@ public class WaitingRoom extends JFrame {
 					case "301": // 방 입장하는 부분
 						// 유저의 창을 닫고 게임방 입장
 						setVisible(false);
-						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName); // 게임입장
+						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName,"game"); // 게임입장
 						gameRoomView.addUser((String)cm.data);
 						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
@@ -266,7 +279,6 @@ public class WaitingRoom extends JFrame {
 						break;
 					case "303":
 						//게임 타이머 300초 설정 & 시작
-						
 						gameRoomView.gameTimerStart();
 						break;
 					case "304": // 제시어 전달 받음 
@@ -290,10 +302,23 @@ public class WaitingRoom extends JFrame {
 						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
 					case "308": // 입장 가능 여부
-						if (cm.data.equals("Full"))
-							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다");
-						else if (cm.data.equals("Started"))
+						if (cm.data.contains("Full")) {
+							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다\n관전 모드로 입장합니다.");
+							
+							String type = cm.data.split(" ")[1];
+							setVisible(false);
+							gameRoomView = new WordChainGameClientRoomView(waitingRoom, type, UserName,"watch"); // 게임입장
+							gameRoomView.addUser((String)type);
+							gameRoomView.settingRoomInfo((String)type);
+						}else if (cm.data.equals("Started")) {
 							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
+							//JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다\n관전 모드로 입장합니다.");
+						}
+						
+//						
+//						gameRoomView = new WordChainGameClientRoomView(waitingRoom, data, UserName,"watch"); // 게임입장
+//						gameRoomView.addUser((String)data);
+//						gameRoomView.settingRoomInfo((String)data);
 						break;
 					case "309": //시간 전달
 						//실행중인 timer가 있으면 종료 후 다시 시작
@@ -366,152 +391,6 @@ public class WaitingRoom extends JFrame {
 			SendObject(obcm);
 		}
 	}
-
-//	// Mouse Event 수신 처리
-//	public void DoMouseEvent(ChatMsg cm) {
-//		Color c;
-//		if (cm.UserName.matches(UserName)) // 본인 것은 이미 Local 로 그렸다.
-//			return;
-//		c = new Color(255, 0, 0); // 다른 사람 것은 Red
-//		gc2.setColor(c);
-//		gc2.fillOval(cm.mouse_e.getX() - pen_size/2, cm.mouse_e.getY() - cm.pen_size/2, cm.pen_size, cm.pen_size);
-//		gc.drawImage(panelImage, 0, 0, panel);
-//	}
-//
-//	public void SendMouseEvent(MouseEvent e) {
-//		ChatMsg cm = new ChatMsg(UserName, "500", "MOUSE");
-//		cm.mouse_e = e;
-//		cm.pen_size = pen_size;
-//		SendObject(cm);
-//	}
-//
-//	class MyMouseWheelEvent implements MouseWheelListener {
-//		@Override
-//		public void mouseWheelMoved(MouseWheelEvent e) {
-//			// TODO Auto-generated method stub
-//			if (e.getWheelRotation() < 0) { // 위로 올리는 경우 pen_size 증가
-//				if (pen_size < 20)
-//					pen_size++;
-//			} else {
-//				if (pen_size > 2)
-//					pen_size--;
-//			}
-//			lblMouseEvent.setText("mouseWheelMoved Rotation=" + e.getWheelRotation() 
-//				+ " pen_size = " + pen_size + " " + e.getX() + "," + e.getY());
-//
-//		}
-//		
-//	}
-//	// Mouse Event Handler
-//	class MyMouseEvent implements MouseListener, MouseMotionListener {
-//		@Override
-//		public void mouseDragged(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseDragged " + e.getX() + "," + e.getY());// 좌표출력가능
-//			Color c = new Color(0,0,255);
-//			gc2.setColor(c);
-//			gc2.fillOval(e.getX()-pen_size/2, e.getY()-pen_size/2, pen_size, pen_size);
-//			// panelImnage는 paint()에서 이용한다.
-//			gc.drawImage(panelImage, 0, 0, panel);
-//			SendMouseEvent(e);
-//		}
-//
-//		@Override
-//		public void mouseMoved(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseMoved " + e.getX() + "," + e.getY());
-//		}
-//
-//		@Override
-//		public void mouseClicked(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseClicked " + e.getX() + "," + e.getY());
-//			Color c = new Color(0,0,255);
-//			gc2.setColor(c);
-//			gc2.fillOval(e.getX()-pen_size/2, e.getY()-pen_size/2, pen_size, pen_size);
-//			gc.drawImage(panelImage, 0, 0, panel);
-//			SendMouseEvent(e);
-//		}
-//
-//		@Override
-//		public void mouseEntered(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseEntered " + e.getX() + "," + e.getY());
-//			// panel.setBackground(Color.YELLOW);
-//
-//		}
-//
-//		@Override
-//		public void mouseExited(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseExited " + e.getX() + "," + e.getY());
-//			// panel.setBackground(Color.CYAN);
-//
-//		}
-//
-//		@Override
-//		public void mousePressed(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mousePressed " + e.getX() + "," + e.getY());
-//
-//		}
-//
-//		@Override
-//		public void mouseReleased(MouseEvent e) {
-//			lblMouseEvent.setText(e.getButton() + " mouseReleased " + e.getX() + "," + e.getY());
-//			// 드래그중 멈출시 보임
-//
-//		}
-//	}
-//
-//	// keyboard enter key 치면 서버로 전송
-//	class TextSendAction implements ActionListener {
-//		@Override
-//		public void actionPerformed(ActionEvent e) {
-//			// Send button을 누르거나 메시지 입력하고 Enter key 치면
-//			if (e.getSource() == btnSend || e.getSource() == txtInput) {
-//				String msg = null;
-//				// msg = String.format("[%s] %s\n", UserName, txtInput.getText());
-//				msg = txtInput.getText();
-//				SendMessage(msg);
-//				txtInput.setText(""); // 메세지를 보내고 나면 메세지 쓰는창을 비운다.
-//				txtInput.requestFocus(); // 메세지를 보내고 커서를 다시 텍스트 필드로 위치시킨다
-//				if (msg.contains("/exit")) // 종료 처리
-//					System.exit(0);
-//			}
-//		}
-//	}
-//
-//	// 화면에 출력
-//	public void AppendText(String msg) {
-//		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.
-//		
-//		StyledDocument doc = textArea.getStyledDocument();
-//		SimpleAttributeSet left = new SimpleAttributeSet();
-//		StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
-//		StyleConstants.setForeground(left, Color.BLACK);
-//	    doc.setParagraphAttributes(doc.getLength(), 1, left, false);
-//		try {
-//			doc.insertString(doc.getLength(), msg+"\n", left );
-//		} catch (BadLocationException e) {
-//			e.printStackTrace();
-//		}
-//		int len = textArea.getDocument().getLength();
-//		textArea.setCaretPosition(len);
-//
-//	}
-//	
-//	// 화면 우측에 출력
-//	public void AppendTextR(String msg) {
-//		msg = msg.trim(); // 앞뒤 blank와 \n을 제거한다.	
-//		StyledDocument doc = textArea.getStyledDocument();
-//		SimpleAttributeSet right = new SimpleAttributeSet();
-//		StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
-//		StyleConstants.setForeground(right, Color.BLUE);	
-//	    doc.setParagraphAttributes(doc.getLength(), 1, right, false);
-//		try {
-//			doc.insertString(doc.getLength(),msg+"\n", right );
-//		} catch (BadLocationException e) {
-//			e.printStackTrace();
-//		}
-//		int len = textArea.getDocument().getLength();
-//		textArea.setCaretPosition(len);
-//
-//	}
 
 	// Windows 처럼 message 제외한 나머지 부분은 NULL 로 만들기 위한 함수
 	public byte[] MakePacket(String msg) {

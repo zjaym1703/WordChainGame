@@ -47,6 +47,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	private int roundTime; // 라운드 시간
 	private int roundCount; // 라운드 수
 	private boolean start; // 게임 시작 여부
+	private String mode; // 게임모드 - 관전인지 게임참여인지 
 	private String currentQ;
 
 	private int turnNumber = 0;
@@ -84,21 +85,23 @@ public class WordChainGameClientRoomView extends JFrame {
 	private JTextPane textArea;
 	public TimerLabel timerLabel;
 	public Thread threadNum;
+	public JLabel gameTypeLabel;
 
 	public JLabel wordLabel;
 	public JLabel countLabel;
 	
 	boolean runFlag = true;
-
+	
 	/**
 	 * Create the application.
 	 */
-	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName) {
+	public WordChainGameClientRoomView(WaitingRoom waitingRoom, String data, String userName,String userMode) {
 		this.waitingRoom = waitingRoom;
 		this.data = data;
 		
-		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@
+		// 방번호#방제목#방장#들어온 인원수#라운드시간#라운드수#개인점수#게임시작상태#user1@user2@|상태1@상태2
 		String d[] = data.split("#");
+		System.out.println(d[0]);
 		this.roomNumber = Integer.parseInt(d[0]); // 방 번호
 		this.roomTitle = d[1]; // 방 제목
 		this.roomManager = d[2]; // 방장
@@ -108,17 +111,22 @@ public class WordChainGameClientRoomView extends JFrame {
 		this.userScore = Integer.parseInt(d[6]); //// 개인 점수
 		this.start = Boolean.parseBoolean(d[7]); // 게임 시작 상태
 		this.UserName = userName; //// 개인 이름
-
+		this.mode = userMode; // 게임모드 - 게임 or 관전 
+		
 		initialize();
 		initListener();
 
 	}
 
 	private void initListener() {
-		TextSendAction action = new TextSendAction();
-		sendButton.addActionListener(action);
-		textInputField.addActionListener(action);
-		textInputField.requestFocus();
+		if(mode.equals("")) {
+			textInputField.setEditable(false);
+		}else {
+			TextSendAction action = new TextSendAction();
+			sendButton.addActionListener(action);
+			textInputField.addActionListener(action);
+			textInputField.requestFocus();
+		}		
 	}
 
 	/**
@@ -211,7 +219,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		countLabel.setBounds(643, 21, 38, 16);
 		contentPanel.add(countLabel);
 
-		JLabel gameTypeLabel = new JLabel("게임종류");
+		gameTypeLabel = new JLabel("게임종류");
 		gameTypeLabel.setBounds(431, 21, 61, 16);
 		contentPanel.add(gameTypeLabel);
 
@@ -438,7 +446,16 @@ public class WordChainGameClientRoomView extends JFrame {
 
 		contentPanel.add(UserListPanel);
 		
-		JLabel gameModeLabel = new JLabel("New label");
+		JLabel gameModeLabel = new JLabel();
+		if(mode.equals("watch")) {
+			gameModeLabel.setOpaque(true); 
+			gameModeLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+			gameModeLabel.setText("관전모드 입니다"); //mode 변경
+			gameModeLabel.setBackground(Color.RED);
+		}else {
+			gameModeLabel.setText(""); //mode 변경
+		}
+		
 		gameModeLabel.setBounds(17, 62, 96, 16);
 		contentPanel.add(gameModeLabel);
 
@@ -609,6 +626,7 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	// 방에서 퇴장한 유저 삭제하는 함수
 	public void deleteUser(String deleteUser, String list) {
+		System.out.println("deleteUser : "+deleteUser+" "+list);
 		String userList[] = list.split("@"); // 나가고 남은 사람들 리스트
 
 		if (userList != null) {
@@ -624,7 +642,10 @@ public class WordChainGameClientRoomView extends JFrame {
 
 	public void addUser(String list) {
 		String data[] = list.split("#");
-		String userList[] = data[data.length - 1].split("@");
+		String Temp[] = data[data.length - 1].split("\\|");
+		String userList[] = Temp[0].split("@");
+		
+		String stateList[] = Temp[1].split("@");
 
 		user = new Vector<UserDTO>();
 		// 받아온 문자열
@@ -633,7 +654,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		// 1#hi#2#0#user1@user2@
 		if (data != null) {
 			for (int i = 0; i < userList.length; i++) {
-				u = new UserDTO(userList[i], userScore, "O");
+				u = new UserDTO(userList[i], userScore, "O",stateList[i]);
 				user.add(u);
 			}
 			addUserPanel(user);
@@ -647,6 +668,10 @@ public class WordChainGameClientRoomView extends JFrame {
 		int userPanelY = 0;
 
 		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).getMode().equals("watch")) {
+				continue;
+			}
+			System.out.print(list.get(i).getMode());
 			UserPanel user = new UserPanel(userPanelX, userPanelY);
 			user.setName(list.get(i).getName());
 			user.setScore(list.get(i).getScore());
@@ -654,7 +679,9 @@ public class WordChainGameClientRoomView extends JFrame {
 			 @Override
 			    public void mouseClicked(MouseEvent e) {
 				 	//나는 클릭 못하도록 하기 
-				 	textInputField.setText("[귓속말] "+user.getName()+" ");
+				 	if(!user.getName().equals(UserName)) {
+				 		textInputField.setText("[귓속말] "+user.getName()+" ");
+				 	}
 			    }
 			});
 			

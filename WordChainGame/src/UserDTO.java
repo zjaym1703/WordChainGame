@@ -4,11 +4,13 @@ public class UserDTO implements Serializable {
 	private String name;
 	private int score;
 	private String status;
+	private String mode; // 게임모드 
 	
-	public UserDTO(String name, int score, String status) {
+	public UserDTO(String name, int score, String status,String mode) {
 		this.name = name;
 		this.score = score;
 		this.status = status;
+		this.mode = mode;
 	}
 
 	public String getName() {
@@ -33,6 +35,14 @@ public class UserDTO implements Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
 	}
 	
 	
