@@ -281,7 +281,6 @@ public class WordChainGameServer extends JFrame {
 			for(int i = 0; i < user_vc.size(); i++) {
 				UserService user = (UserService) user_vc.elementAt(i); // 가장 최근에 들어온 사람
 				for(int j = 0; j < users.length; j++) {
-					System.out.print("user mode:"+user.UserMode);
 					if(user.UserName.equals(users[users.length - 1])) {
 						user.GameRoomEnterAlarmOne("create", tmp);
 						WriteOne(UserName + "님 환영합니다.\n");
@@ -292,28 +291,6 @@ public class WordChainGameServer extends JFrame {
 						break;
 					}
 				}
-			}
-		}
-		
-		//관전모드 일때 게임방 입장 알림 
-		public void GameWatchEnterAlarm(String msg) {
-			System.out.println("GameWatchEnterAlarmOne : "+msg);
-			try {
-				ChatMsg r_ob = new ChatMsg(UserName, "308", msg);
-				oos.writeObject(r_ob);
-			} catch (IOException e) {
-				AppendText("dos.writeObject() error");
-				try {
-					ois.close();
-					oos.close();
-					client_socket.close();
-					client_socket = null;
-					ois = null;
-					oos = null;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				Logout(); // 에러가난 현재 객체를 벡터에서 지운다
 			}
 		}
 		
@@ -474,10 +451,10 @@ public class WordChainGameServer extends JFrame {
 		public void CantGameEnterAlarmOne(String type,String roomInfo) {
 			try {
 				if (type.equals("Full")) {
-					ChatMsg r_ob = new ChatMsg(UserName, "308", "Full "+roomInfo);
+					ChatMsg r_ob = new ChatMsg(UserName, "308", "Full$"+roomInfo);
 					oos.writeObject(r_ob);
 				} else if (type.equals("Started")) {
-					ChatMsg r_ob = new ChatMsg(UserName, "308", "Started ");
+					ChatMsg r_ob = new ChatMsg(UserName, "308", "Started$");
 					oos.writeObject(r_ob);
 				}
 			} catch (IOException e) {
@@ -838,7 +815,6 @@ public class WordChainGameServer extends JFrame {
 					}else {
 						msg+="@"+u1.UserName;
 					}
-					
 				}
 			}
 			System.out.println("list data :"+msg);
@@ -906,9 +882,7 @@ public class WordChainGameServer extends JFrame {
 							UserStatus = "S";
 						} else if (args[1].matches("/wakeup")) {
 							UserStatus = "O";
-						} else if (args[1].matches("/to")) { // 귓속말
-							
-						} else { // 일반 채팅 메시지
+						}else { // 일반 채팅 메시지
 							for (int i=0; i<RoomVec.size(); i++) {
 								Room room = RoomVec.get(i);
 								
@@ -968,13 +942,23 @@ public class WordChainGameServer extends JFrame {
 							boolean compareWord = words.compareWord(cm.data);
 							if (compareWord) { // 정답일 때
 								RoomUserListVec = getRoomUserList(cm.roomNumber);
-
+								
 								int user_seq = RoomTurnList.get(cm.roomNumber);
 								user_seq++;
+								
 								if(user_seq == RoomUserListVec.size()) {
 									user_seq = 0; //초기화 
 								}
 								
+								//관전모드인 사람 턴넘기기 
+								UserService u1 = (UserService) RoomUserListVec.elementAt(user_seq);
+								if(u1.UserMode.equals("watch")) {
+									user_seq++;
+									if(user_seq == RoomUserListVec.size()) {
+										user_seq = 0; //초기화 
+									}
+								}
+
 								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
 							
 								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
@@ -989,10 +973,20 @@ public class WordChainGameServer extends JFrame {
 									
 								int user_seq = RoomTurnList.get(cm.roomNumber);
 								user_seq++;
+								
 								if(user_seq == RoomUserListVec.size()) {
 									user_seq = 0; //초기화 
 								}
-										
+								
+								//관전모드인 사람 턴넘기기 
+								UserService u1 = (UserService) RoomUserListVec.elementAt(user_seq);
+								if(u1.UserMode.equals("watch")) {
+									user_seq++;
+									if(user_seq == RoomUserListVec.size()) {
+										user_seq = 0; //초기화 
+									}
+								}
+				
 								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
 									
 								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
@@ -1006,7 +1000,6 @@ public class WordChainGameServer extends JFrame {
 
 					}else if(cm.code.matches("301")) { // 방 입장
 						UserMode = "game";
-						System.out.println("user :: "+UserName+" : mode ::"+UserMode);
 						for(int i = 0; i < RoomVec.size(); i++) {
 							Room room = RoomVec.get(i);
 							
@@ -1063,7 +1056,6 @@ public class WordChainGameServer extends JFrame {
 					} else if(cm.code.matches("303")) { //게임시작 
 						AppendText(msg);
 						roomNumber = (int)cm.roomNumber;
-						System.out.print("전달된 방번호"+roomNumber);
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
 						int user_seq = 0; //게임시작했을때 턴은 0으로 
@@ -1083,7 +1075,6 @@ public class WordChainGameServer extends JFrame {
 						for(int i=0;i<RoomUserListVec.size();i++) {
 							UserService u = (UserService)RoomUserListVec.elementAt(i);
 							if(u.UserName.equals(name)) {
-								System.out.println(name+" "+score);
 								u.UserScore = score;
 							}
 						}
@@ -1091,25 +1082,35 @@ public class WordChainGameServer extends JFrame {
 						for(int i=0;i<RoomVec.size();i++) {
 							Room room = RoomVec.get(i);
 							if(cm.roomNumber == room.roomNumber) {
-								room.roomCount--; // 방의 인원수 한명 줄임
 								// 팀원의 이름과 상태를 빼줌
 								String[] userlist = room.userList.split("@");
 								String[] userStatus = room.userStatusList.split("@");
 								String newUserList = "";
 								String newStatusList = "";
 								
+								boolean watchFlag = false;
+								
 								for(int j =0;j<userlist.length;j++) {
-									if(cm.UserName.equals(userlist[j])) {
+									if(cm.UserName.equals(userlist[j])){
+										if(userStatus[j].equals("watch")) {
+											watchFlag = true;
+										}
 										continue;
+									}else {
+										newUserList += userlist[j]+"@";
+										newStatusList += userStatus[j]+"@";
 									}
-									newUserList = userlist[j]+"@";
-									newStatusList = userStatus[j]+"@";
+									
+								}
+								if(watchFlag == false) {
+									room.roomCount--; // 방의 인원수 한명 줄임
 								}
 								
 								room.userList = newUserList;
 								room.userStatusList = newStatusList;
 								AppendText(room.userList);
 								AppendText(room.userStatusList);
+								AppendText(String.valueOf(room.roomCount));
 								// room.userList = room.userList.replace(cm.UserName + "@", ""); // 해당 유저를 방 리스트에서 지움
 								
 								RoomExit(room, cm.UserName);
@@ -1128,8 +1129,7 @@ public class WordChainGameServer extends JFrame {
 						RoomUserListVec = getRoomUserList(roomNumber);
 						
 						msg = getFirstWinUser(roomNumber); //사용자명&점수
-						
-						//게임방 없앰
+
 						sendResult(msg);
 						
 						break;

@@ -266,6 +266,7 @@ public class WaitingRoom extends JFrame {
 
 					case "301": // 방 입장하는 부분
 						// 유저의 창을 닫고 게임방 입장
+						System.out.println("user ::"+cm.data);
 						setVisible(false);
 						gameRoomView = new WordChainGameClientRoomView(waitingRoom, cm.data, UserName,"game"); // 게임입장
 						gameRoomView.addUser((String)cm.data);
@@ -302,23 +303,18 @@ public class WaitingRoom extends JFrame {
 						gameRoomView.settingRoomInfo((String)cm.data);
 						break;
 					case "308": // 입장 가능 여부
+						System.out.println(cm.data);
 						if (cm.data.contains("Full")) {
 							JOptionPane.showMessageDialog(rootPane, "인원이 다 찼습니다\n관전 모드로 입장합니다.");
 							
-							String type = cm.data.split(" ")[1];
+							String type = cm.data.split("\\$")[1];
 							setVisible(false);
 							gameRoomView = new WordChainGameClientRoomView(waitingRoom, type, UserName,"watch"); // 게임입장
 							gameRoomView.addUser((String)type);
 							gameRoomView.settingRoomInfo((String)type);
 						}else if (cm.data.equals("Started")) {
 							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
-							//JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다\n관전 모드로 입장합니다.");
 						}
-						
-//						
-//						gameRoomView = new WordChainGameClientRoomView(waitingRoom, data, UserName,"watch"); // 게임입장
-//						gameRoomView.addUser((String)data);
-//						gameRoomView.settingRoomInfo((String)data);
 						break;
 					case "309": //시간 전달
 						//실행중인 timer가 있으면 종료 후 다시 시작

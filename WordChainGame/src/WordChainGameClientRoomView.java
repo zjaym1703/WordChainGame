@@ -550,7 +550,6 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	// 타이머 스레드 실행시키는 함수
 	public void startTimer() {
-		System.out.print("타이머 스레드 호출");
 		runFlag = true;
 
 		threadNum = new Thread(new Runnable() {
@@ -588,7 +587,6 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	// 타이머 스레드 중지시키는 함수
 	public void stopTimer() {
-		System.out.print("타이머 스레드 중지");
 		runFlag = false;
 		threadNum.interrupt();
 	}
@@ -805,7 +803,6 @@ public class WordChainGameClientRoomView extends JFrame {
 	
 	//게임종료 alert 띄우기
 	public void showgameEndDialog(String name,String score) {
-		System.out.println("client: "+name+" "+score);
 		String msg = name+"님이 우승했습니다!!\n\n"+score+"점";
 		JOptionPane.showMessageDialog(contentPanel, msg,"게임종료", JOptionPane.INFORMATION_MESSAGE, null);
 	}
