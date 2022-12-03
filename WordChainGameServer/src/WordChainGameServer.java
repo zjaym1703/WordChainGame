@@ -790,42 +790,36 @@ public class WordChainGameServer extends JFrame {
 			int[] score = new int[RoomUserListVec.size()];
 			for(int i=0;i<score.length;i++) {
 				UserService u = (UserService) RoomUserListVec.elementAt(i);
-				score[i] = u.UserScore;
+				if(u.UserMode.equals("game")) {
+					score[i] = u.UserScore;
+				}
 			}
 			
 			int[] rank = new int[RoomUserListVec.size()];
 			Arrays.fill(rank, 1); //배열 원소를 1로 초기화 
 			
-			for(int i=1;i<score.length;i++) {
-				rank[i] = 1;
+			for(int i=0;i<score.length;i++) {
 				for(int j=0;j<score.length;j++) {
 					if(score[j] > score[i]) {
 						rank[i] = rank[i]+1;
 					}
 				}
 			}
-			
+
 			int rankFlag = 0; //무승부를 체크 하는 값 
 			for(int i=0;i<RoomUserListVec.size();i++) {
 				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
-				if(rank[i] == 1) {
-					rankFlag++;
-					if(rankFlag == 1) {
-						msg =u1.UserScore +"&"+u1.UserName;
-					}else {
-						msg+="@"+u1.UserName;
+				if(u1.UserMode.equals("game")) {
+					if(rank[i] == 1) {
+						rankFlag++;
+						if(rankFlag == 1) {
+							msg =u1.UserScore +"&"+u1.UserName;
+						}else {
+							msg+="@"+u1.UserName;
+						}
 					}
 				}
 			}
-			System.out.println("list data :"+msg);
-
-//			for(int i=1;i<RoomUserListVec.size();i++) {
-//				UserService u1 = (UserService) RoomUserListVec.elementAt(i);
-//				if(u1.UserScore > firstWinScore) {
-//					firstWinScore = u1.UserScore;
-//					firstWinUser = u1.UserName;
-//				}
-//			}
 			
 			return msg;
 		}
@@ -897,8 +891,6 @@ public class WordChainGameServer extends JFrame {
 						AppendText(msg); // server 화면에 출력
 						String[] args = msg.split(" "); // 단어들을 분리한다.
 						
-						System.out.println(args[2]+" ");
-						
 						for (int i = 0; i < user_vc.size(); i++) {
 							UserService user = (UserService) user_vc.elementAt(i);
 							if (user.UserName.matches(args[2]) && user.UserStatus.matches("O")) {
@@ -962,7 +954,6 @@ public class WordChainGameServer extends JFrame {
 								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
 							
 								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
-								//u.setTurn(false);
 								
 								AlarmToTurn(cm.roomNumber, u, "not first", cm.data); // 턴 전송
 								sendTimeAll();
@@ -990,7 +981,7 @@ public class WordChainGameServer extends JFrame {
 								RoomTurnList.put(cm.roomNumber, user_seq); //방마다 턴을 저장함 
 									
 								UserService u = (UserService) RoomUserListVec.elementAt(user_seq);
-								//u.setTurn(false);
+								
 								AlarmToTurn(cm.roomNumber, u, "not first", cm.currentQ); // 턴 전송
 								sendTimeAll();
 								ScoreAlarm(myRoom, cm.UserName, "wrong");

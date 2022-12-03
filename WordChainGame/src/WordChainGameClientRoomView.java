@@ -49,7 +49,6 @@ public class WordChainGameClientRoomView extends JFrame {
 	private String mode; // 게임모드 - 관전인지 게임참여인지 
 	private String currentQ;
 
-	private int turnNumber = 0;
 	private Vector<UserDTO> user;
 	private UserDTO u;
 
@@ -218,9 +217,9 @@ public class WordChainGameClientRoomView extends JFrame {
 		countLabel.setBounds(643, 21, 38, 16);
 		contentPanel.add(countLabel);
 
-		gameTypeLabel = new JLabel("게임종류");
-		gameTypeLabel.setBounds(431, 21, 61, 16);
-		contentPanel.add(gameTypeLabel);
+//		gameTypeLabel = new JLabel("게임종류");
+//		gameTypeLabel.setBounds(431, 21, 61, 16);
+//		contentPanel.add(gameTypeLabel);
 
 		JPanel scorePanel = new JPanel() {
 			public void paintComponent(Graphics g) {
@@ -733,7 +732,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
-			clip.loop(1);
             clip.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -746,7 +744,6 @@ public class WordChainGameClientRoomView extends JFrame {
 		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(file));
-			clip.loop(1);
             clip.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
