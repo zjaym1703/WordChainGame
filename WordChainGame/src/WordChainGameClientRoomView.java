@@ -249,7 +249,7 @@ public class WordChainGameClientRoomView extends JFrame {
 		timerPanel.setBounds(611, 107, 70, 70);
 		timerPanel.setLayout(null);
 
-		int second = 30;
+		int second = 20;
 		timerLabel = new TimerLabel(second);
 		timerLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 18));
 		timerLabel.setForeground(new Color(251, 255, 250));
