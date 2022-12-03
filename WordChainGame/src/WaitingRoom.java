@@ -297,8 +297,9 @@ public class WaitingRoom extends JFrame {
 							gameRoomView = new WordChainGameClientRoomView(waitingRoom, type, UserName,"watch"); // 게임입장
 							gameRoomView.addUser((String)type);
 							gameRoomView.settingRoomInfo((String)type);
-						}else if (cm.data.equals("Started")) {
+						}else if (cm.data.contains("Started")) {
 							JOptionPane.showMessageDialog(rootPane, "게임이 진행중입니다");
+							System.out.println(cm.data);
 						}
 						break;
 					case "309": //시간 전달
