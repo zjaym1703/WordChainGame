@@ -153,8 +153,6 @@ public class WaitingRoom extends JFrame {
 				if(e.getClickCount() == 2) {
 					int index = list.locationToIndex(e.getPoint());
 					//창 띄워주기
-					//WordChainGameModeSelectedDialog dialog = new WordChainGameModeSelectedDialog(waitingRoom,index,UserName);
-					//dialog.setVisible(true);
 					ChatMsg obcm = new ChatMsg(UserName, "301", UserName + " enter GameRoom");
 					obcm.SetRoomNumber(index);
 					SendObject(obcm);
@@ -171,7 +169,6 @@ public class WaitingRoom extends JFrame {
 			oos.flush();
 			ois = new ObjectInputStream(socket.getInputStream());
 
-			// SendMessage("/login " + UserName);
 			ChatMsg obcm = new ChatMsg(UserName, "100", "New User Enter");
 			SendObject(obcm);
 
@@ -180,18 +177,6 @@ public class WaitingRoom extends JFrame {
 			RoomCreateAction roomCreateAction = new RoomCreateAction();
 			startButton.addActionListener(roomCreateAction);
 			
-			
-//			TextSendAction action = new TextSendAction();
-//			btnSend.addActionListener(action);
-//			txtInput.addActionListener(action);
-//			txtInput.requestFocus();
-//			ImageSendAction action2 = new ImageSendAction();
-//			imgBtn.addActionListener(action2);
-//			MyMouseEvent mouse = new MyMouseEvent();
-//			panel.addMouseMotionListener(mouse);
-//			panel.addMouseListener(mouse);
-//			MyMouseWheelEvent wheel = new MyMouseWheelEvent();
-//			panel.addMouseWheelListener(wheel);
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 		}
@@ -361,12 +346,8 @@ public class WaitingRoom extends JFrame {
 		System.out.println(obj.UserName+" : "+obj.data);
 		try {
 			oos.writeObject(obj);
-			if (obj.code.equals("300")) { 
-				//oos.writeObject(obj.imgbytes);
-			}
 			oos.flush();
 		} catch (IOException e) {
-			//AppendText("SendChatMsg Error");
 			e.printStackTrace();
 			try {
 				oos.close();
