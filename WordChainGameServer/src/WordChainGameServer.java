@@ -454,7 +454,7 @@ public class WordChainGameServer extends JFrame {
 					ChatMsg r_ob = new ChatMsg(UserName, "308", "Full$"+roomInfo);
 					oos.writeObject(r_ob);
 				} else if (type.equals("Started")) {
-					ChatMsg r_ob = new ChatMsg(UserName, "308", "Started$");
+					ChatMsg r_ob = new ChatMsg(UserName, "308", "Started$"+roomInfo);
 					oos.writeObject(r_ob);
 				}
 			} catch (IOException e) {
@@ -1011,19 +1011,23 @@ public class WordChainGameServer extends JFrame {
 									GameRoomEnterAlarm(myRoom);
 								}
 								else { 
-									UserMode = "watch";
-									myRoom = room;
-									myRoom.setUserList(UserName);
-									myRoom.setUserStatusList("watch"); // 게임방에 접속한 유저의 상태를 추가
+									if (room.start == true) {
+										CantGameEnterAlarm(UserName, "Started","");
+									}else {
+										UserMode = "watch";
+										myRoom = room;
+										myRoom.setUserList(UserName);
+										myRoom.setUserStatusList("watch"); // 게임방에 접속한 유저의 상태를 추가
+										
+										String tmp = RoomInfo(myRoom);
 									
-									String tmp = RoomInfo(myRoom);
-								
-									WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기	
-									if (room.start == true) 
-										CantGameEnterAlarm(UserName, "Started",tmp);
-									else
+										WaitUserVec.remove(UserName); // 대기실 벡터에서 해당 사용자 빼기	
+										
 										CantGameEnterAlarm(UserName, "Full",tmp);
+									}
+										
 								}
+								System.out.println("방 참가자 :"+myRoom.userList);
 								break;
 							}
 						}
