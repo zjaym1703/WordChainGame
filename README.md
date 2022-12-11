@@ -36,7 +36,7 @@
 게임 시작 시 wordlist.txt 파일에서 단어를 불러와 게임 참여 유저에게 전달, 차례대로 답을 입력하는 경우 10점 추가, 오답을 입력하는 경우 10점 감점, 20초의 입력시간 동안 입력하지 않는 경우도 10점 감점
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/41943129/206896436-0cf3be59-08db-411e-9d39-824df509f618.gif)
 
-게임 종료 시 게임결과를 다이얼로그로 표현<br>
+게임 종료 시 게임결과를 다이얼로그로 알림<br>
 <img width="400" alt="image" src="https://user-images.githubusercontent.com/41943129/206895492-9c15de86-8517-42b9-85c5-ce0f16e618b0.png">
 
 
