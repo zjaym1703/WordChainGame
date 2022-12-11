@@ -4,8 +4,14 @@
 - 게임방에 입장 후 끝말 잇기 게임을 진행하며 프로그램 내부에 저장된 단어를 맞추는 경우 점수를 획득하는 게임 
 - 끄투의 기능을 클론하여 socket API로 미니프로젝트를 진행
 
+### 개발기간
+2022.11.04 ~ 2022.12.03
+
 ### 개발환경과 개발 언어
 <img src="https://img.shields.io/badge/Java-007396.svg?style=for-the-badge&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/Eclipse-2C2255.svg?style=for-the-badge&logo=Eclipse&logoColor=white"/>
+
+### 개발자
+🧐 [zjaym1703](https://github.com/zjaym1703) | 😀 [hs-1971540-kimeunji](https://github.com/hs-1971540-kimeunji)
 
 ### 게임 시나리오
 - 게임 참여 유저는 로그인 후 대기 방에 접속. 
